@@ -3,918 +3,2737 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Time Travel Through Objects | 4,000 Years of Design</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Outfit:wght@300;400;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <title>Time Travel Through Objects | A Visual Expedition</title>
+  <meta name="description" content="A visual expedition through 4,000 years of design. What can objects tell us about the people who made them?" />
+  
+  <style>
+    /* ============================================================
+       00. RESET & THEME TOKENS
+       ============================================================ */
+    :root {
+      --bg-space: #07090e;
+      --bg-surface: #0f131c;
+      --bg-card: #151a26;
+      --bg-card-hover: #1c2333;
+      --text-main: #f0f4f8;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      /* Historical Epoch Colors */
+      --c-part1: #e28743;       /* Ochre / Terracotta / Ancient craft */
+      --c-part1-glow: rgba(226, 135, 67, 0.25);
+      --c-part2: #f26419;       /* Industrial Brass / Flame */
+      --c-part2-glow: rgba(242, 100, 25, 0.25);
+      --c-part3: #00e5ff;       /* Network Cyan / Digital */
+      --c-part3-glow: rgba(0, 229, 255, 0.25);
+      --c-accent: #ffd166;      /* Golden discovery */
+      
+      /* Typography */
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, Consolas, monospace;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      
+      --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      background-color: var(--bg-space);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+    }
+
+    body {
+      overflow-x: hidden;
+      line-height: 1.6;
+      background: radial-gradient(circle at 50% 10%, #151b29 0%, var(--bg-space) 70%);
+      background-attachment: fixed;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-space); }
+    ::-webkit-scrollbar-thumb { background: #263044; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4866; }
+
+    /* ============================================================
+       01. EXPEDITION HUD & TOP NAVIGATION
+       ============================================================ */
+    .hud-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      background: rgba(7, 9, 14, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: var(--transition);
+    }
+
+    .hud-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .hud-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+    }
+
+    .hud-brand .compass-icon {
+      animation: spinSlow 20s linear infinite;
+    }
+
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Interactive Timeline Route in HUD */
+    .hud-timeline-route {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hud-node {
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-full);
+      transition: var(--transition);
+    }
+
+    .hud-node:hover, .hud-node.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .hud-node.part1.active { color: var(--c-part1); background: var(--c-part1-glow); }
+    .hud-node.part2.active { color: var(--c-part2); background: var(--c-part2-glow); }
+    .hud-node.part3.active { color: var(--c-part3); background: var(--c-part3-glow); }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .btn-hud {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: var(--transition);
+    }
+
+    .btn-hud:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .hud-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--c-part1), var(--c-part2), var(--c-part3));
+      transition: width 0.15s ease-out;
+    }
+
+    /* ============================================================
+       02. COMMON LAYOUT & TYPOGRAPHY
+       ============================================================ */
+    .section-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 6rem 1.5rem 5rem;
+      position: relative;
+    }
+
+    .expedition-hero {
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding-top: 5rem;
+      position: relative;
+    }
+
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-muted);
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      margin-bottom: 1.25rem;
+      max-width: 950px;
+      background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      color: var(--text-muted);
+      max-width: 680px;
+      margin-bottom: 2rem;
+      font-weight: 400;
+    }
+
+    .hero-timeline-track {
+      width: 100%;
+      max-width: 800px;
+      margin: 2.5rem 0;
+      position: relative;
+      padding: 1.5rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .track-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--c-accent);
+      margin-bottom: 0.8rem;
+    }
+
+    .floating-objects-stream {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .floating-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #fff;
+      animation: floatMotion 4s ease-in-out infinite alternate;
+    }
+    .floating-item:nth-child(2) { animation-delay: 1.3s; }
+    .floating-item:nth-child(3) { animation-delay: 2.6s; }
+
+    @keyframes floatMotion {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .cta-button {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 1rem 2.2rem;
+      border-radius: var(--radius-full);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 10px 25px rgba(234, 88, 12, 0.35);
+      transition: var(--transition);
+      cursor: pointer;
+      border: none;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(234, 88, 12, 0.55);
+    }
+
+    /* ============================================================
+       03. CREW ROSTER SECTION
+       ============================================================ */
+    .crew-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .crew-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      transition: var(--transition);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .crew-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .crew-avatar {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 1.2rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .crew-card.cora .crew-avatar { border-color: var(--c-part1); box-shadow: 0 0 15px var(--c-part1-glow); }
+    .crew-card.theo .crew-avatar { border-color: var(--c-part2); box-shadow: 0 0 15px var(--c-part2-glow); }
+    .crew-card.ivy .crew-avatar { border-color: var(--c-part3); box-shadow: 0 0 15px var(--c-part3-glow); }
+    .crew-card.ana .crew-avatar { border-color: var(--c-accent); box-shadow: 0 0 15px rgba(255, 209, 102, 0.3); }
+
+    .crew-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.2rem;
+    }
+
+    .crew-role {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.8rem;
+      color: var(--c-accent);
+    }
+
+    .crew-quote {
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .crew-action-badge {
+      font-size: 0.72rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-full);
+      color: var(--text-dim);
+    }
+
+    /* ============================================================
+       04. THE JOURNEY MAP (HERO VISUAL ANCHOR)
+       ============================================================ */
+    .journey-map-container {
+      background: linear-gradient(180deg, #0d121c 0%, #080b11 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 1.5rem;
+      margin: 3rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .journey-map-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .journey-map-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .journey-column {
+      background: rgba(255, 255, 255, 0.025);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: var(--transition);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .journey-column:hover {
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-5px);
+    }
+
+    .journey-column.part-1 { border-top: 4px solid var(--c-part1); }
+    .journey-column.part-2 { border-top: 4px solid var(--c-part2); }
+    .journey-column.part-3 { border-top: 4px solid var(--c-part3); }
+    .journey-column.return { border-top: 4px solid var(--c-accent); }
+
+    .j-icon { font-size: 2.8rem; margin: 0.8rem 0; }
+    .j-time { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); }
+    .j-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+    .j-core { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.75rem; }
+    .journey-column.part-1 .j-core { color: var(--c-part1); }
+    .journey-column.part-2 .j-core { color: var(--c-part2); }
+    .journey-column.part-3 .j-core { color: var(--c-part3); }
+    .journey-column.return .j-core { color: var(--c-accent); }
+
+    .j-substeps {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      width: 100%;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+      padding-top: 0.8rem;
+      margin-top: auto;
+    }
+
+    /* ============================================================
+       05. EPOCH SECTIONS & HISTORICAL STOPS
+       ============================================================ */
+    .epoch-banner {
+      padding: 3rem 2rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 3.5rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .epoch-part1 {
+      background: linear-gradient(135deg, rgba(226, 135, 67, 0.15) 0%, rgba(15, 19, 28, 0.9) 100%);
+      border: 1px solid rgba(226, 135, 67, 0.3);
+    }
+    .epoch-part2 {
+      background: linear-gradient(135deg, rgba(242, 100, 25, 0.15) 0%, rgba(15, 19, 28, 0.9) 100%);
+      border: 1px solid rgba(242, 100, 25, 0.3);
+    }
+    .epoch-part3 {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.15) 0%, rgba(15, 19, 28, 0.9) 100%);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+    }
+
+    .guide-callout {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.8rem 1.4rem;
+      border-radius: var(--radius-full);
+      font-size: 0.92rem;
+      color: #fff;
+    }
+
+    .guide-callout img, .guide-callout svg {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    /* Historical Timeline Spine Layout */
+    .timeline-stops-container {
+      position: relative;
+      margin-left: 1.5rem;
+      padding-left: 2rem;
+      border-left: 2px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .epoch-part1 ~ .timeline-stops-container { border-left-color: var(--c-part1); }
+    .epoch-part2 ~ .timeline-stops-container { border-left-color: var(--c-part2); }
+    .epoch-part3 ~ .timeline-stops-container { border-left-color: var(--c-part3); }
+
+    .stop-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      margin-bottom: 3rem;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .stop-card:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .stop-card::before {
+      content: "";
+      position: absolute;
+      left: -2.75rem;
+      top: 2rem;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--bg-space);
+      border: 3px solid #fff;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .epoch-part1 ~ .timeline-stops-container .stop-card::before { border-color: var(--c-part1); color: var(--c-part1); }
+    .epoch-part2 ~ .timeline-stops-container .stop-card::before { border-color: var(--c-part2); color: var(--c-part2); }
+    .epoch-part3 ~ .timeline-stops-container .stop-card::before { border-color: var(--c-part3); color: var(--c-part3); }
+
+    .stop-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .stop-number {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--c-accent);
+      text-transform: uppercase;
+    }
+
+    .stop-era {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .stop-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .stop-object-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-full);
+      color: #fff;
+      margin-bottom: 1.2rem;
+    }
+
+    /* 3-Tier Reading Information Architecture */
+    .level-1-idea {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin: 0.8rem 0;
+      line-height: 1.3;
+    }
+
+    .epoch-part1 ~ .timeline-stops-container .level-1-idea { color: var(--c-part1); }
+    .epoch-part2 ~ .timeline-stops-container .level-1-idea { color: var(--c-part2); }
+    .epoch-part3 ~ .timeline-stops-container .level-1-idea { color: var(--c-part3); }
+
+    .level-2-clue {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid rgba(255, 255, 255, 0.3);
+      padding: 0.6rem 1rem;
+      margin: 0.8rem 0 1.2rem;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .level-2-clue strong {
+      color: var(--c-accent);
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .stop-description {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Interactive Visual Artifact Box */
+    .artifact-visual-box {
+      background: #090c13;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      position: relative;
+    }
+
+    .artifact-svg-wrapper {
+      max-width: 320px;
+      width: 100%;
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .artifact-caption {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+
+    /* Stop Footer: Level 3 Deep Dive Button */
+    .stop-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-deep-dive {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 0.82rem;
+      font-family: var(--font-mono);
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: var(--transition);
+    }
+
+    .btn-deep-dive:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #fff;
+    }
+
+    /* ============================================================
+       06. SPECIAL INTERACTIVE EXPERIENCES
+       ============================================================ */
+    /* Exploded Joinery Interactive for Ming Chair (Stop 05) */
+    .joinery-toggle-btn {
+      margin-top: 0.8rem;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      background: rgba(226, 135, 67, 0.2);
+      border: 1px solid var(--c-part1);
+      color: #fff;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .joinery-toggle-btn:hover {
+      background: var(--c-part1);
+    }
+
+    /* Stop 08: Morph Slider (Art Nouveau) */
+    .morph-container {
+      width: 100%;
+      max-width: 460px;
+      margin: 1rem auto;
+      text-align: center;
+    }
+    .morph-slider {
+      width: 100%;
+      margin: 1rem 0;
+      accent-color: var(--c-part2);
+    }
+
+    /* Stop 09: Bauhaus Overlap Diagram */
+    .bauhaus-diagram {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      height: 220px;
+      width: 100%;
+    }
+
+    .bauhaus-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      position: absolute;
+      mix-blend-mode: screen;
+      opacity: 0.85;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .bc-art { background: #e63946; left: calc(50% - 110px); top: 30px; }
+    .bc-craft { background: #457b9d; right: calc(50% - 110px); top: 30px; }
+    .bc-industry { background: #e9c46a; left: calc(50% - 65px); bottom: 20px; color: #000; }
+    .bauhaus-circle:hover { transform: scale(1.08); z-index: 10; opacity: 1; }
+
+    .bauhaus-center-core {
+      position: absolute;
+      z-index: 12;
+      background: #fff;
+      color: #000;
+      padding: 0.4rem 0.9rem;
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 900;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    /* Two Watches Showdown Interactive (Stops 10-12 Detour) */
+    .watch-comparison-arena {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1.5rem;
+      align-items: stretch;
+      margin: 2.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .watch-comparison-arena {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .watch-card {
+      background: #0e131d;
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: var(--transition);
+    }
+
+    .watch-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .watch-card.watch-a { border-top: 4px solid var(--c-part1); }
+    .watch-card.watch-b { border-top: 4px solid var(--c-part2); }
+
+    .watch-vs-badge {
+      align-self: center;
+      background: #1a2233;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 0.9rem;
+      color: var(--c-accent);
+    }
+
+    .watch-spec-list {
+      list-style: none;
+      margin: 1.5rem 0;
+      text-align: left;
+      width: 100%;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .watch-spec-list li {
+      padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Stop 17: Lifecycle Fork Comparison */
+    .lifecycle-fork-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 680px) {
+      .lifecycle-fork-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .fork-card {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .fork-card.mechanical { border-color: rgba(0, 229, 255, 0.4); }
+    .fork-card.smart { border-color: rgba(239, 68, 68, 0.4); }
+
+    .fork-flow {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      margin: 1rem 0;
+      line-height: 1.8;
+      padding: 0.8rem;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* Exit / Dialogue transitions */
+    .character-exit-card {
+      background: linear-gradient(135deg, rgba(20, 25, 38, 0.95), rgba(11, 14, 23, 0.95));
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      margin: 4rem 0;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      .character-exit-card {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .exit-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #1a2233;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .exit-quote {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: #fff;
+      font-style: italic;
+      margin-bottom: 0.8rem;
+    }
+
+    /* ============================================================
+       07. MASTER SYNTHESIS: THE THREE OBJECTS
+       ============================================================ */
+    .three-objects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin: 3.5rem 0;
+    }
+
+    @media (max-width: 860px) {
+      .three-objects-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .three-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .three-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+
+    .three-card.c1 { border-top: 6px solid var(--c-part1); }
+    .three-card.c2 { border-top: 6px solid var(--c-part2); }
+    .three-card.c3 { border-top: 6px solid var(--c-part3); }
+
+    .three-step-list {
+      margin-top: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .three-arrow {
+      color: var(--c-accent);
+      font-size: 0.9rem;
+    }
+
+    /* Final Screen */
+    .final-revelation-box {
+      background: radial-gradient(circle at center, #182236 0%, #06090e 80%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      padding: 5rem 2rem;
+      text-align: center;
+      margin: 4rem 0;
+      position: relative;
+    }
+
+    .monumental-quote {
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin: 2rem auto;
+      max-width: 900px;
+      color: #fff;
+    }
+
+    .monumental-sub {
+      font-size: 1.3rem;
+      color: var(--c-accent);
+      font-style: italic;
+      margin-bottom: 2.5rem;
+    }
+
+    .progression-ladder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin: 2.5rem 0;
+    }
+
+    .ladder-arrow {
+      color: var(--c-accent);
+      font-size: 0.9rem;
+    }
+
+    /* ============================================================
+       08. MODAL FOR LEVEL 3 ARCHIVAL DEEP DIVES
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-lg);
+      max-width: 650px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2.5rem;
+      position: relative;
+      transform: translateY(20px);
+      transition: var(--transition);
+    }
+
+    .modal-overlay.open .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .modal-crew-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Sound indicator status */
+    .sound-active {
+      color: var(--c-accent) !important;
+    }
+  </style>
 </head>
-<body class="theme-landing">
+<body>
 
-  <!-- ==================== STICKY EXPEDITION HUD ==================== -->
-  <header class="hud-header" id="hud">
-    <div class="hud-brand">
-      <span class="hud-compass">🧭</span>
-      <span class="hud-title">EXPEDITION // 4,000 YRS</span>
-    </div>
+  <!-- ============================================================
+       01. EXPEDITION HUD (TOP NAV / INTERACTIVE SPUR)
+       ============================================================ -->
+  <header class="hud-header">
+    <div class="hud-container">
+      <a href="#hero" class="hud-brand" onclick="playBeep(440, 0.05)">
+        <span class="compass-icon">🧭</span>
+        <span>ANA'S EXPEDITION</span>
+      </a>
 
-    <!-- Quick Navigation Map -->
-    <nav class="hud-nav" aria-label="Journey Map Navigation">
-      <a href="#landing" class="hud-link active" data-era="landing">Base</a>
-      <a href="#journey-map" class="hud-link" data-era="map">Map</a>
-      <a href="#part-1" class="hud-link" data-era="part1">
-        <span class="era-dot dot-part1"></span> I: Society
-      </a>
-      <a href="#part-2" class="hud-link" data-era="part2">
-        <span class="era-dot dot-part2"></span> II: Machines
-      </a>
-      <a href="#part-3" class="hud-link" data-era="part3">
-        <span class="era-dot dot-part3"></span> III: Digital
-      </a>
-      <a href="#synthesis" class="hud-link" data-era="synthesis">Synthesis</a>
-    </nav>
+      <!-- Quick Hop Node Strip -->
+      <nav class="hud-timeline-route" aria-label="Expedition Timeline Route">
+        <a href="#part1" class="hud-node part1" onclick="playBeep(520, 0.05)">🪑 Part I &bull; 1450 BCE</a>
+        <a href="#part2" class="hud-node part2" onclick="playBeep(660, 0.05)">⚙️ Part II &bull; Machines</a>
+        <a href="#part3" class="hud-node part3" onclick="playBeep(880, 0.05)">🌐 Part III &bull; Digital</a>
+        <a href="#synthesis" class="hud-node" onclick="playBeep(980, 0.05)">✨ Synthesis</a>
+      </nav>
 
-    <div class="hud-tools">
-      <div class="reading-mode">
-        <span class="mode-tag">LEVEL 1–3</span>
+      <!-- HUD Controls -->
+      <div class="hud-controls">
+        <button id="soundToggle" class="btn-hud" title="Toggle Synthesized Expedition Audio" onclick="toggleAudio()">
+          <span id="soundIcon">🔇</span>
+          <span id="soundText">Sound Off</span>
+        </button>
+        <button id="modeToggle" class="btn-hud" onclick="toggleReadingSpeed()">
+          <span>⚡ 3-Min Scan</span>
+        </button>
       </div>
-      <button id="sound-toggle" class="btn-tool" title="Toggle Ambient Audio">
-        <span id="sound-icon">🔊</span>
-      </button>
     </div>
-    <div class="hud-progress-bar" id="progress-bar"></div>
+    <!-- Interactive scroll progress indicator -->
+    <div class="hud-progress-bar" id="progressBar"></div>
   </header>
 
-  <!-- ==================== 01: LANDING SCREEN ==================== -->
-  <section class="screen hero-screen" id="landing">
-    <div class="stars-bg"></div>
-    <div class="hero-content">
-      <div class="badge-era">EXPEDITION LAUNCH // 1450 BCE → TODAY → ?</div>
-      <h1 class="hero-title">
-        TIME TRAVEL <br><span class="gradient-text">THROUGH OBJECTS</span>
-      </h1>
-      <p class="hero-subtitle">A visual expedition through 4,000 years of design</p>
+  <main>
+    <!-- ============================================================
+         02. THE LANDING SCREEN (01 & 02)
+         ============================================================ -->
+    <section id="hero" class="section-wrap expedition-hero">
+      <div class="tag-badge">TIME TRAVEL THROUGH OBJECTS &bull; 4,000 YEARS OF DESIGN</div>
+      
+      <h1 class="hero-title">What can objects tell us about the people who made them?</h1>
+      
+      <p class="hero-subtitle">
+        Captain Ana embarks on an expedition across four millennia. Behind her lies the long continuum of human creation: from Egyptian woodcarvers to interconnected algorithmic swarms.
+      </p>
 
-      <!-- Floating Artifact Icons -->
-      <div class="floating-artifacts">
-        <div class="artifact-pill float-1">🪑 1450 BCE · CHAIR</div>
-        <div class="artifact-pill float-2">⌚ c.1850 · WATCH</div>
-        <div class="artifact-pill float-3">📱 TODAY · SMARTWATCH</div>
+      <!-- Whimsical Interactive Visual: Ana & Time Machine -->
+      <div class="hero-timeline-track">
+        <div class="track-labels">
+          <span>1450 BCE</span>
+          <span>CHAIR &bull; WATCH &bull; SMARTWATCH</span>
+          <span>TODAY &rarr; ?</span>
+        </div>
+
+        <div class="floating-objects-stream">
+          <div class="floating-item" style="color: var(--c-part1);">
+            <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+              <!-- Chair SVG -->
+              <path d="M30 20 L30 65 L70 65 L70 20" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+              <path d="M25 50 L75 50" stroke="currentColor" stroke-width="6" />
+              <path d="M30 65 L25 90 M70 65 L75 90" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+              <circle cx="50" cy="35" r="8" fill="currentColor" fill-opacity="0.2" />
+            </svg>
+            <span>CHAIR</span>
+          </div>
+
+          <div style="font-size: 1.5rem; color: var(--text-dim);">&rarr;</div>
+
+          <div class="floating-item" style="color: var(--c-part2);">
+            <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+              <!-- Pocket Watch SVG -->
+              <circle cx="50" cy="55" r="32" stroke="currentColor" stroke-width="4" />
+              <path d="M50 23 L50 15 M42 15 L58 15" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+              <circle cx="50" cy="55" r="3" fill="currentColor" />
+              <path d="M50 55 L65 45 M50 55 L50 35" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+            </svg>
+            <span>WATCH</span>
+          </div>
+
+          <div style="font-size: 1.5rem; color: var(--text-dim);">&rarr;</div>
+
+          <div class="floating-item" style="color: var(--c-part3);">
+            <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+              <!-- Smartwatch SVG -->
+              <rect x="30" y="30" width="40" height="40" rx="10" stroke="currentColor" stroke-width="4" />
+              <path d="M38 30 L38 12 L62 12 L62 30 M38 70 L38 88 L62 88 L62 70" stroke="currentColor" stroke-width="3" />
+              <path d="M42 50 Q50 42 58 50" stroke="currentColor" stroke-width="2" />
+              <circle cx="50" cy="50" r="2" fill="currentColor" />
+            </svg>
+            <span>SMARTWATCH</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Captain Ana Introduction -->
-      <div class="ana-hero-card">
-        <div class="character-avatar pulse-glow">
-          <svg viewBox="0 0 100 100" class="svg-avatar">
-            <circle cx="50" cy="50" r="46" fill="#1f2937" stroke="#60a5fa" stroke-width="4"/>
-            <circle cx="50" cy="42" r="22" fill="#fed7aa"/>
-            <path d="M30 40 C30 22 70 22 70 40 Z" fill="#2563eb"/>
-            <!-- Compass Goggles -->
-            <circle cx="42" cy="40" r="7" fill="#0f172a" stroke="#fbbf24" stroke-width="2"/>
-            <circle cx="58" cy="40" r="7" fill="#0f172a" stroke="#fbbf24" stroke-width="2"/>
-            <circle cx="42" cy="40" r="2" fill="#38bdf8"/>
-            <circle cx="58" cy="40" r="2" fill="#38bdf8"/>
-            <path d="M44 54 Q50 60 56 54" stroke="#c2410c" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M28 88 C32 68 68 68 72 88 Z" fill="#1e3a8a"/>
-            <circle cx="50" cy="74" r="5" fill="#fbbf24"/>
-          </svg>
-        </div>
-        <div class="ana-dialogue">
-          <p class="speaker-name">CAPTAIN ANA // EXPEDITION LEAD</p>
-          <blockquote class="dialogue-text">
-            “What can objects tell us about the people who made them? <br>
-            <strong>I travel through time to find out. But I don’t travel alone.</strong>”
-          </blockquote>
-        </div>
+      <div style="margin-top: 1rem;">
+        <a href="#crew" class="cta-button" onclick="playTimeWarp()">
+          <span>START THE EXPEDITION</span>
+          <span style="font-size: 1.3rem;">&rarr;</span>
+        </a>
       </div>
+    </section>
 
-      <a href="#crew" class="cta-button">
-        START THE JOURNEY <span class="arrow">→</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- ==================== 02: MEET THE CREW ==================== -->
-  <section class="screen crew-screen" id="crew">
-    <div class="section-container">
-      <div class="center-header">
-        <span class="eyebrow">02 // EXPEDITION ROSTER</span>
-        <h2 class="section-title">Meet the Crew</h2>
-        <p class="section-lead">Four functional perspectives decoding human history through physical things.</p>
+    <!-- ============================================================
+         03. MEET THE CREW (02)
+         ============================================================ -->
+    <section id="crew" class="section-wrap">
+      <div style="text-align: center; max-width: 700px; margin: 0 auto 2rem;">
+        <div class="tag-badge">02 &bull; EXPEDITION PERSONNEL</div>
+        <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem;">She Doesn't Travel Alone</h2>
+        <p style="color: var(--text-muted);">
+          Each crew member serves as an interactive lens. Click any guide below to inspect their mission dossier.
+        </p>
       </div>
 
       <div class="crew-grid">
-        <!-- Ana -->
-        <div class="crew-card" data-guide="ana">
-          <div class="crew-badge">🧭 NAVIGATOR</div>
-          <div class="avatar-box">
-            <span class="crew-icon">🧭</span>
+        <!-- Captain Ana -->
+        <div class="crew-card ana" onclick="openCrewModal('ana')">
+          <div class="crew-avatar">
+            <svg width="60" height="60" viewBox="0 0 100 100">
+              <circle cx="50" cy="45" r="28" fill="#ffd166" fill-opacity="0.2" stroke="#ffd166" stroke-width="3"/>
+              <!-- Compass Hair & Smile -->
+              <path d="M35 48 Q50 60 65 48" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle cx="42" cy="38" r="4" fill="#fff"/>
+              <circle cx="58" cy="38" r="4" fill="#fff"/>
+              <polygon points="50,15 54,30 50,26 46,30" fill="#ffd166"/>
+            </svg>
           </div>
-          <h3>Captain Ana</h3>
-          <div class="role-tag">Time Traveller</div>
-          <p class="quote">“I take us through time and keep the journey connected.”</p>
-          <div class="focus-bar"><span>ROLE</span><strong>Transitions & Synthesis</strong></div>
+          <h3 class="crew-name">🧭 Captain Ana</h3>
+          <p class="crew-role">Time Traveller</p>
+          <p class="crew-quote">"I take us through time."</p>
+          <span class="crew-action-badge">Examine Navigation Log &rarr;</span>
         </div>
 
-        <!-- Cora -->
-        <div class="crew-card" data-guide="cora">
-          <div class="crew-badge">🏺 CULTURE</div>
-          <div class="avatar-box cora-bg">
-            <span class="crew-icon">🏺</span>
+        <!-- Curator Cora -->
+        <div class="crew-card cora" onclick="openCrewModal('cora')">
+          <div class="crew-avatar">
+            <svg width="60" height="60" viewBox="0 0 100 100">
+              <circle cx="50" cy="48" r="28" fill="#e28743" fill-opacity="0.2" stroke="#e28743" stroke-width="3"/>
+              <!-- Cora oversized glasses -->
+              <circle cx="40" cy="45" r="10" stroke="#fff" stroke-width="3" fill="none"/>
+              <circle cx="60" cy="45" r="10" stroke="#fff" stroke-width="3" fill="none"/>
+              <line x1="50" y1="45" x2="50" y2="45" stroke="#fff" stroke-width="3"/>
+              <path d="M42 62 Q50 66 58 62" stroke="#fff" stroke-width="2" fill="none"/>
+            </svg>
           </div>
-          <h3>Curator Cora</h3>
-          <div class="role-tag">Objects & Society</div>
-          <p class="quote">“I read what handmade shapes reveal about human power and rank.”</p>
-          <div class="focus-bar"><span>LEADS</span><strong>Part I: 1450 BCE → 1859</strong></div>
+          <h3 class="crew-name">🏺 Curator Cora</h3>
+          <p class="crew-role">Objects & Culture</p>
+          <p class="crew-quote">"I read what objects reveal about society."</p>
+          <span class="crew-action-badge">Cultural Clues &rarr;</span>
         </div>
 
-        <!-- Theo -->
-        <div class="crew-card" data-guide="theo">
-          <div class="crew-badge">⚙️ INDUSTRY</div>
-          <div class="avatar-box theo-bg">
-            <span class="crew-icon">⚙️</span>
+        <!-- Theorist Theo -->
+        <div class="crew-card theo" onclick="openCrewModal('theo')">
+          <div class="crew-avatar">
+            <svg width="60" height="60" viewBox="0 0 100 100">
+              <circle cx="50" cy="48" r="28" fill="#f26419" fill-opacity="0.2" stroke="#f26419" stroke-width="3"/>
+              <!-- Gear shape behind / mechanical hair -->
+              <path d="M35 32 L40 22 L46 28 L54 20 L60 28 L66 22 L70 32" stroke="#f26419" stroke-width="3" fill="none"/>
+              <circle cx="43" cy="46" r="3.5" fill="#fff"/>
+              <circle cx="57" cy="46" r="3.5" fill="#fff"/>
+              <line x1="42" y1="60" x2="58" y2="60" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            </svg>
           </div>
-          <h3>Theorist Theo</h3>
-          <div class="role-tag">Technology & Change</div>
-          <p class="quote">“I investigate what happens when machines enter design and standardize time.”</p>
-          <div class="focus-bar"><span>LEADS</span><strong>Part II: Machines & Precision</strong></div>
+          <h3 class="crew-name">⚙️ Theorist Theo</h3>
+          <p class="crew-role">Technology & Change</p>
+          <p class="crew-quote">"I investigate what happens when machines enter design."</p>
+          <span class="crew-action-badge">Industrial Theories &rarr;</span>
         </div>
 
-        <!-- Ivy -->
-        <div class="crew-card" data-guide="ivy">
-          <div class="crew-badge">🔎 FUTURES</div>
-          <div class="avatar-box ivy-bg">
-            <span class="crew-icon">🔎</span>
+        <!-- Detective Ivy -->
+        <div class="crew-card ivy" onclick="openCrewModal('ivy')">
+          <div class="crew-avatar">
+            <svg width="60" height="60" viewBox="0 0 100 100">
+              <circle cx="50" cy="48" r="28" fill="#00e5ff" fill-opacity="0.2" stroke="#00e5ff" stroke-width="3"/>
+              <!-- Detective visor / hat -->
+              <path d="M28 36 Q50 25 72 36 L70 42 Q50 35 30 42 Z" fill="#00e5ff" fill-opacity="0.4" stroke="#00e5ff" stroke-width="2"/>
+              <circle cx="42" cy="48" r="3" fill="#fff"/>
+              <circle cx="58" cy="48" r="3" fill="#fff"/>
+              <path d="M60 52 L75 66" stroke="#00e5ff" stroke-width="3" stroke-linecap="round"/>
+            </svg>
           </div>
-          <h3>Detective Ivy</h3>
-          <div class="role-tag">Clues & Ecosystems</div>
-          <p class="quote">“I investigate digital systems, lifecycle limits, and emotional survival.”</p>
-          <div class="focus-bar"><span>LEADS</span><strong>Part III: Digital & Future</strong></div>
+          <h3 class="crew-name">🔎 Detective Ivy</h3>
+          <p class="crew-role">Clues & Consequences</p>
+          <p class="crew-quote">"I look for what these changes mean for the future."</p>
+          <span class="crew-action-badge">Forensic Ledger &rarr;</span>
         </div>
       </div>
+    </section>
 
-      <div class="transition-banner">
-        <p>The four crew members board the time machine. The map unfolds.</p>
-        <a href="#journey-map" class="map-link">EXPEDITION MAP UNFOLDED ↓</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== 03: THE JOURNEY MAP ==================== -->
-  <section class="screen map-screen" id="journey-map">
-    <div class="section-container">
-      <div class="center-header">
-        <span class="eyebrow">03 // THE COMPLETE ROUTE</span>
-        <h2 class="section-title">The Journey of Objects</h2>
-        <p class="section-lead">Three major transformations over 4,000 years of civilization.</p>
-      </div>
-
-      <!-- Interactive Route Canvas / SVG Display -->
-      <div class="interactive-map-board">
-        <div class="route-line-svg-wrap">
-          <svg viewBox="0 0 1000 240" class="map-svg-line" preserveAspectRatio="none">
-            <path d="M 50 120 C 250 30, 250 210, 500 120 C 750 30, 750 210, 950 120" fill="none" stroke="#334155" stroke-width="6" stroke-dasharray="8 6"/>
-            <path id="active-route-trace" d="M 50 120 C 250 30, 250 210, 500 120 C 750 30, 750 210, 950 120" fill="none" stroke="#38bdf8" stroke-width="6" stroke-dasharray="1200" stroke-dashoffset="1200"/>
-          </svg>
+    <!-- ============================================================
+         04. THE JOURNEY MAP (MAIN VISUAL EXPEDITION SPINE)
+         ============================================================ -->
+    <section id="map" class="section-wrap">
+      <div class="journey-map-container">
+        <div class="journey-map-header">
+          <div class="tag-badge">🗺️ THE COMPLETE JOURNEY</div>
+          <h2 style="font-size: 2.2rem; font-weight: 800; color: #fff;">The Journey of Objects</h2>
+          <p style="color: var(--text-muted); max-width: 650px; margin: 0.5rem auto 0;">
+            A nonlinear temporal route from 1450 BCE to the connected threshold of tomorrow. Choose a destination to drop directly into the field.
+          </p>
         </div>
 
-        <div class="map-destinations-grid">
-          <!-- Dest 1 -->
-          <a href="#part-1" class="map-hub hub-part1">
-            <div class="hub-pill">1450 BCE – 1859</div>
-            <div class="hub-symbol">🪑</div>
-            <h4>PART I</h4>
-            <h5>SOCIETY</h5>
-            <p>Power, Status & Craft Before Machines</p>
-            <span class="hub-action">Explore 6 Stops →</span>
+        <div class="journey-map-grid">
+          <!-- Column 1 -->
+          <a href="#part1" class="journey-column part-1" onclick="playBeep(440, 0.08)">
+            <span class="j-time">1450 BCE &rarr; c.1859</span>
+            <div class="j-icon">🪑</div>
+            <h3 class="j-title">PART I: SOCIETY</h3>
+            <div class="j-core">POWER & STATUS</div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Before machines learned to repeat the human hand.
+            </p>
+            <div class="j-substeps">
+              <span>01 &bull; Reniseneb (Egypt)</span>
+              <span>02 &bull; Klismos (Greece)</span>
+              <span>03 &bull; Coronation (Europe)</span>
+              <span>04 &bull; Caquetoire (France)</span>
+              <span>05 &bull; Ming Quanyi (China)</span>
+              <span>06 &bull; Thonet No. 14</span>
+            </div>
           </a>
 
-          <!-- Dest 2 -->
-          <a href="#part-2" class="map-hub hub-part2">
-            <div class="hub-pill">c.1850 – 1920s</div>
-            <div class="hub-symbol">⌚</div>
-            <h4>PART II</h4>
-            <h5>MACHINES</h5>
-            <p>Precision, Railways & Craft vs Industry</p>
-            <span class="hub-action">Explore 6 Stops →</span>
+          <!-- Column 2 -->
+          <a href="#part2" class="journey-column part-2" onclick="playBeep(550, 0.08)">
+            <span class="j-time">MID-19TH C &rarr; EARLY 20TH</span>
+            <div class="j-icon">⌚</div>
+            <h3 class="j-title">PART II: MACHINES</h3>
+            <div class="j-core">CRAFT VS. INDUSTRY</div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+              When machines changed beauty & time itself became an object.
+            </p>
+            <div class="j-substeps">
+              <span>07 &bull; Arts & Crafts</span>
+              <span>08 &bull; Art Nouveau</span>
+              <span>09 &bull; Bauhaus</span>
+              <span>10 &bull; Handcrafted Watch</span>
+              <span>11 &bull; Waltham Repeatability</span>
+              <span>12 &bull; Railway Precision</span>
+            </div>
           </a>
 
-          <!-- Dest 3 -->
-          <a href="#part-3" class="map-hub hub-part3">
-            <div class="hub-pill">~2006 – BEYOND</div>
-            <div class="hub-symbol">📱</div>
-            <h4>PART III</h4>
-            <h5>DIGITAL</h5>
-            <p>Ecosystems, Data & Emotional Durability</p>
-            <span class="hub-action">Explore 8 Stops →</span>
+          <!-- Column 3 -->
+          <a href="#part3" class="journey-column part-3" onclick="playBeep(700, 0.08)">
+            <span class="j-time">c.2006 &rarr; BEYOND</span>
+            <div class="j-icon">🌐</div>
+            <h3 class="j-title">PART III: DIGITAL</h3>
+            <div class="j-core">TIME BECOMES DATA</div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+              The physical artifact dissolves into a living planetary network.
+            </p>
+            <div class="j-substeps">
+              <span>13 &bull; Network Time</span>
+              <span>14 &bull; Smartwatch Ecosystem</span>
+              <span>15 &bull; The Disappearing Object</span>
+              <span>16 &bull; Materials & Silicon</span>
+              <span>17 &bull; The Lifecycle Fork</span>
+              <span>18 &bull; Emotional Durability</span>
+              <span>19 &bull; Museum with No Walls</span>
+              <span>20 &bull; Digital Passports</span>
+            </div>
           </a>
 
-          <!-- Return Home -->
-          <a href="#synthesis" class="map-hub hub-return">
-            <div class="hub-pill">TODAY</div>
-            <div class="hub-symbol">🧭</div>
-            <h4>SYNTHESIS</h4>
-            <h5>WHAT WE LEAVE</h5>
-            <p>Objects do not merely survive history. They remember it.</p>
-            <span class="hub-action">View Finale →</span>
+          <!-- Column 4 -->
+          <a href="#synthesis" class="journey-column return" onclick="playBeep(880, 0.08)">
+            <span class="j-time">RETURN HOME</span>
+            <div class="j-icon">🧭</div>
+            <h3 class="j-title">SYNTHESIS</h3>
+            <div class="j-core">WHAT WILL WE LEAVE?</div>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Chair &bull; Watch &bull; Smartwatch collapse into one realization.
+            </p>
+            <div class="j-substeps">
+              <span>&bull; Society Organized</span>
+              <span>&bull; Time Organized</span>
+              <span>&bull; Information Organized</span>
+              <span>&bull; The Final Revelation</span>
+            </div>
           </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ==================== PART I: OBJECTS -> SOCIETY ==================== -->
-  <section class="screen era-section era-part1" id="part-1">
-    <div class="section-container">
-      
-      <!-- Era Header -->
-      <div class="era-header-card">
-        <div class="era-title-meta">
-          <span class="part-indicator">🟤 PART I // 1450 BCE → 1859</span>
-          <h2>BEFORE MACHINES LEARNED TO REPEAT</h2>
-          <div class="thesis-pill">OBJECT → SOCIETY</div>
+    <!-- ============================================================
+         05. PART I: BEFORE MACHINES LEARNED TO REPEAT (🟤 STOPS 01–06)
+         ============================================================ -->
+    <section id="part1" class="section-wrap">
+      <div class="epoch-banner epoch-part1">
+        <div class="tag-badge" style="background: rgba(226, 135, 67, 0.2); border-color: var(--c-part1); color: #fff;">
+          🟤 PART I &bull; 1450 BCE TO 1859
         </div>
-        <div class="era-guide-bubble">
-          <div class="mini-guide-avatar">🏺</div>
-          <div class="mini-bubble-text">
-            <strong>Curator Cora:</strong> “Ana, look closely. Before factories, furniture wasn't merely practical. Every joint, curve, and height communicated who ruled, who served, and who belonged.”
-          </div>
-        </div>
-      </div>
+        <h2 style="font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; line-height: 1.15;">
+          Before Machines Learned to Repeat
+        </h2>
+        <p style="max-width: 720px; color: #ffedd5; font-size: 1.05rem;">
+          OBJECT &rarr; SOCIETY. For millennia, objects carried the unmistakable fingerprints of status, social structure, and handmade singularity.
+        </p>
 
-      <!-- Timeline Stops Grid -->
-      <div class="stops-timeline">
-        
-        <!-- Stop 01 -->
-        <article class="stop-card" data-stop="1">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 01</span>
-            <span class="stop-date">1450 BCE · ANCIENT EGYPT</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">POWER ↑</span>
-              <h3>Chair of Reniseneb</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Elevated seating + carved lion-paw legs</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Elevated seating communicated divine authority and social elevation.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(1)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 02 -->
-        <article class="stop-card" data-stop="2">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 02</span>
-            <span class="stop-date">CLASSICAL GREECE</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">FORM ↔ COMFORT</span>
-              <h3>Klismos Chair</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Concave sloping backrest + swept legs</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Design shifts to balance posture, civic harmony, and democratic ease.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(2)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 03 -->
-        <article class="stop-card" data-stop="3">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 03</span>
-            <span class="stop-date">1308 · MEDIEVAL EUROPE</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">CHAIR → THRONE → STATE</span>
-              <h3>Coronation Chair</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Heavy oak cathedral architecture + Stone of Scone</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Seating embodies sacred legitimacy and unbroken monarchical lineage.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(3)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 04 -->
-        <article class="stop-card" data-stop="4">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 04</span>
-            <span class="stop-date">16TH CENTURY · RENAISSANCE</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">BODY → CLOTHING → CHAIR</span>
-              <h3>Caquetoire (“Gossip Chair”)</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Trapezoidal splayed seat with narrow backrest</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Furniture reshapes to accommodate voluminous court skirts and intimate salons.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(4)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 05: Ming Chair with Interactive Joinery -->
-        <article class="stop-card highlight-card" data-stop="5">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 05</span>
-            <span class="stop-date">MING DYNASTY CHINA</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">SIMPLE OUTSIDE · COMPLEX INSIDE</span>
-              <h3>Quanyi (Round-backed Armchair)</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Silky Huanghuali wood + hidden mortise-and-tenon joints</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Mastery through restraint. No nails, no glue—craft conceals its supreme difficulty.</p>
-            </div>
-
-            <!-- Mini Interactive Widget -->
-            <div class="interactive-mini-box">
-              <div class="joinery-visual" id="joinery-view">
-                <div class="wood-arm">
-                  <div class="joint-indicator" id="joint-marker">CONCEALED TENON</div>
-                </div>
-              </div>
-              <button class="btn-toggle-joint" id="btn-toggle-joint">Toggle X-Ray Joinery ⚡</button>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(5)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 06 -->
-        <article class="stop-card milestone-card" data-stop="6">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 06 · PIVOT MOMENT</span>
-            <span class="stop-date">c. 1859 · INDUSTRIAL REVOLUTION</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">REPEATABLE → ACCESSIBLE</span>
-              <h3>Thonet Chair No. 14</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> 6 steam-bent beechwood parts, 10 screws, 2 washers</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Mass production democratizes seating. 36 chairs flat-packed in a single 1-cubic-meter crate.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(6)">Inspect Object Details 🔎</button>
-        </article>
-      </div>
-
-      <!-- Cora Exit Card -->
-      <div class="crew-departure-card">
-        <div class="departure-avatar">🏺</div>
-        <div class="departure-quote">
-          <blockquote>
-            “For thousands of years, objects carried the direct, unrepeatable touch of human hands. But look ahead at the factory smokestacks: <strong>what happens when machines learn to repeat?</strong>”
-          </blockquote>
-          <span class="speaker">— Curator Cora steps back as the time machine leaps forward</span>
+        <div class="guide-callout">
+          <span>🏺</span>
+          <span><strong>Curator Cora:</strong> "Notice who gets to sit above the floor. In every ancient culture, furniture is quiet political theater."</span>
         </div>
       </div>
 
-    </div>
-  </section>
-
-  <!-- ==================== PART II: MACHINES -> TIME ==================== -->
-  <section class="screen era-section era-part2" id="part-2">
-    <div class="section-container">
-
-      <!-- Era Header -->
-      <div class="era-header-card theo-border">
-        <div class="era-title-meta">
-          <span class="part-indicator">🟠 PART II // 1850s → 1920s</span>
-          <h2>WHEN MACHINES CHANGED BEAUTY</h2>
-          <div class="thesis-pill">MACHINE ↔ HUMAN ↔ TIME</div>
-        </div>
-        <div class="era-guide-bubble">
-          <div class="mini-guide-avatar">⚙️</div>
-          <div class="mini-bubble-text">
-            <strong>Theorist Theo:</strong> “Ana! We stepped into soot, steam, and steel. When machines started manufacturing everything, artists panicked, designers fought back, and then... they turned to <em>mechanize time itself</em>.”
+      <div class="timeline-stops-container">
+        <!-- STOP 01 -->
+        <article class="stop-card" id="stop01">
+          <div class="stop-header">
+            <span class="stop-number">STOP 01 &bull; 1450 BCE</span>
+            <span class="stop-era">Ancient Egypt &bull; Thebes</span>
           </div>
-        </div>
+          <h3 class="stop-title">Chair of Reniseneb</h3>
+          <div class="stop-object-badge">🪑 Artifact: Carved Acacia & Ebony Inlay</div>
+
+          <div class="level-1-idea">OBJECTS CAN SHOW POWER</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Elevated seating = elevated status. The floor was for ordinary people; elevation signified divine proximity.
+          </div>
+
+          <p class="stop-description">
+            The chair was not simply something to sit on. Its height, lion-paw legs carved facing forward, and imported ebony communicate absolute authority. In a world where most sat on reed mats, a wooden chair was monumental.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div class="artifact-svg-wrapper">
+              <svg width="220" height="150" viewBox="0 0 200 150">
+                <!-- Egyptian Chair with Lion Paws -->
+                <path d="M50 30 L50 90 L150 90 L150 30" stroke="#e28743" stroke-width="5" stroke-linecap="round"/>
+                <path d="M45 80 L155 80" stroke="#ffd166" stroke-width="7"/>
+                <!-- Lion paws -->
+                <path d="M50 90 Q40 125 45 135 L55 135 Q60 120 50 90" fill="#e28743"/>
+                <path d="M150 90 Q140 125 145 135 L155 135 Q160 120 150 90" fill="#e28743"/>
+                <!-- Cora magnifying glass inspection -->
+                <circle cx="105" cy="55" r="22" stroke="#fff" stroke-width="2.5" fill="rgba(255,255,255,0.08)"/>
+                <line x1="122" y1="70" x2="140" y2="88" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                <text x="105" y="58" fill="#ffd166" font-size="10" font-family="monospace" text-anchor="middle">POWER &uarr;</text>
+              </svg>
+            </div>
+            <div class="artifact-caption">Visual Clue: Cora examines lion-paw legs under magnification. Status carved in acacia.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">EGYPT &bull; STATUS</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Reniseneb Chair', 'Cora', 'Excavated from Thebes, this chair exhibits sophisticated mortise-and-tenon joinery without nails. Its height placed Reniseneb physically closer to Ra, converting carpentry into cosmic hierarchy.')">
+              <span>Read Cora's Field Notes</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 02 -->
+        <article class="stop-card" id="stop02">
+          <div class="stop-header">
+            <span class="stop-number">STOP 02 &bull; c. 5th Century BCE</span>
+            <span class="stop-era">Classical Greece &bull; Athens</span>
+          </div>
+          <h3 class="stop-title">The Klismos Chair</h3>
+          <div class="stop-object-badge">🪑 Artifact: Splayed Sabre Legs & Swept Backrest</div>
+
+          <div class="level-1-idea">DESIGN CAN BALANCE BEAUTY + COMFORT</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Curved legs + concave backrest. For the first time, furniture accommodates relaxed human anatomy rather than rigid throne postures.
+          </div>
+
+          <p class="stop-description">
+            The Greek Klismos dispensed with animal-demon motifs. Its continuous sabre curves distributed weight smoothly while allowing the sitter to recline freely during intellectual discourse and domestic life.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div class="artifact-svg-wrapper">
+              <svg width="220" height="150" viewBox="0 0 200 150">
+                <!-- Klismos Chair -->
+                <path d="M60 25 Q90 35 140 25" stroke="#e28743" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <path d="M75 32 Q95 85 95 85 L135 85 Q130 50 140 25" stroke="#e28743" stroke-width="4" fill="none"/>
+                <!-- Splayed legs -->
+                <path d="M95 85 Q75 115 60 135" stroke="#ffd166" stroke-width="5" stroke-linecap="round"/>
+                <path d="M135 85 Q145 115 160 135" stroke="#ffd166" stroke-width="5" stroke-linecap="round"/>
+                <text x="100" y="110" fill="#fff" font-size="11" font-family="monospace" text-anchor="middle">FORM &harr; COMFORT</text>
+              </svg>
+            </div>
+            <div class="artifact-caption">Visual Balance: Civic balance replaces autocratic stiffness.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">GREECE &bull; COMFORT</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Klismos Chair', 'Cora', 'The Klismos reflects democratic ideals of the Athenian polis. Depicted on grave steles and red-figure vases, women and scholars sit on it with equal ease.')">
+              <span>Read Cora's Field Notes</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 03 -->
+        <article class="stop-card" id="stop03">
+          <div class="stop-header">
+            <span class="stop-number">STOP 03 &bull; 1300 CE</span>
+            <span class="stop-era">Medieval Europe &bull; Westminster Abbey</span>
+          </div>
+          <h3 class="stop-title">The Coronation Chair</h3>
+          <div class="stop-object-badge">👑 Artifact: St. Edward's Oak Throne & Stone of Scone</div>
+
+          <div class="level-1-idea">OBJECTS CAN REPRESENT AUTHORITY</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Monumental gothic spire + political relic containment. The chair became synonymous with state legitimacy.
+          </div>
+
+          <p class="stop-description">
+            Commissioned by King Edward I to encase the captured Stone of Scone, this solid oak throne transformed a seat into an immutable architectural pillar of divine kingship.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div class="artifact-svg-wrapper">
+              <svg width="220" height="150" viewBox="0 0 200 150">
+                <!-- Gothic Throne -->
+                <polygon points="100,10 70,60 130,60" fill="none" stroke="#e28743" stroke-width="4"/>
+                <rect x="70" y="60" width="60" height="75" stroke="#e28743" stroke-width="4" fill="rgba(226,135,67,0.1)"/>
+                <!-- Crown symbol -->
+                <path d="M85 90 L92 80 L100 90 L108 80 L115 90 L115 98 L85 98 Z" fill="#ffd166"/>
+                <text x="100" y="130" fill="#fff" font-size="9" font-family="monospace" text-anchor="middle">CHAIR &rarr; THRONE &rarr; POWER</text>
+              </svg>
+            </div>
+            <div class="artifact-caption">Visual Lineage: Physical seat turned political sovereignty vessel.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">MEDIEVAL &bull; AUTHORITY</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Coronation Chair', 'Cora', 'Over 700 years, every English monarch sat here for crowning. Its painted gilt foliage and seated stone proved that stability was engineered into oak.')">
+              <span>Read Cora's Field Notes</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 04 -->
+        <article class="stop-card" id="stop04">
+          <div class="stop-header">
+            <span class="stop-number">STOP 04 &bull; 16th Century</span>
+            <span class="stop-era">French Renaissance</span>
+          </div>
+          <h3 class="stop-title">The Caquetoire</h3>
+          <div class="stop-object-badge">👗 Artifact: Trapezoidal "Chatter" Chair</div>
+
+          <div class="level-1-idea">SOCIETY CHANGES DESIGN</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Flaring trapezoid seat engineered specifically around voluminous hoop skirts and salons.
+          </div>
+
+          <p class="stop-description">
+            Named from the French verb *caqueter* (to chatter), its narrow back and expanding triangular front allowed noblewomen wearing massive farthingales to sit comfortably and converse without crushing costly textiles.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div class="artifact-svg-wrapper">
+              <svg width="220" height="150" viewBox="0 0 200 150">
+                <!-- Trapezoid seat -->
+                <polygon points="90,40 110,40 145,100 55,100" stroke="#e28743" stroke-width="4" fill="rgba(255,209,102,0.1)"/>
+                <!-- Dress silhouette overlay -->
+                <path d="M100 20 Q120 50 160 110 L40 110 Q80 50 100 20" stroke="#00e5ff" stroke-dasharray="3,3" stroke-width="2" fill="none"/>
+                <text x="100" y="130" fill="#fff" font-size="9" font-family="monospace" text-anchor="middle">BODY &rarr; CLOTHING &rarr; FURNITURE</text>
+              </svg>
+            </div>
+            <div class="artifact-caption">Visual Clue: Fashion directly alters the wood's geometry.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">RENAISSANCE &bull; SOCIAL LIFE</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Caquetoire', 'Cora', 'The Caquetoire reminds us that objects do not emerge in a vacuum: salon culture and textile technology dictated wood joinery angles.')">
+              <span>Read Cora's Field Notes</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 05 -->
+        <article class="stop-card" id="stop05">
+          <div class="stop-header">
+            <span class="stop-number">STOP 05 &bull; 17th Century</span>
+            <span class="stop-era">Ming Dynasty &bull; China</span>
+          </div>
+          <h3 class="stop-title">The Quanyi Chair</h3>
+          <div class="stop-object-badge">🪵 Artifact: Huanghuali Rounded-Arm Chair</div>
+
+          <div class="level-1-idea">CRAFT CAN HIDE ITS OWN COMPLEXITY</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Concealed interlocking mortise and tenons. Zero metal fasteners; complex joints vanish inside continuous silky curves.
+          </div>
+
+          <p class="stop-description">
+            Ming scholars prized *ziran* (naturalness). Master joiners used intricate puzzle-like pressure joints that allowed precious tropical timber to expand and contract across humid seasons without cracking.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div class="artifact-svg-wrapper">
+              <svg id="mingSvg" width="220" height="150" viewBox="0 0 200 150">
+                <!-- Sweeping horseshoe crest rail -->
+                <path d="M40 85 Q100 15 160 85" stroke="#e28743" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <rect x="65" y="70" width="70" height="40" stroke="#ffd166" stroke-width="4" fill="none"/>
+                <line x1="70" y1="110" x2="65" y2="140" stroke="#e28743" stroke-width="4"/>
+                <line x1="130" y1="110" x2="135" y2="140" stroke="#e28743" stroke-width="4"/>
+                <!-- Joinery glow indicator -->
+                <circle id="joineryGlow" cx="100" cy="40" r="10" stroke="#00e5ff" stroke-width="2" fill="none" opacity="0.3"/>
+              </svg>
+            </div>
+            <button class="joinery-toggle-btn" onclick="toggleJoineryGlow()">
+              Toggle Internal Joinery X-Ray ⚡
+            </button>
+            <div class="artifact-caption" id="joineryLabel">SIMPLE OUTSIDE &bull; COMPLEX INSIDE</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">MING CHINA &bull; CRAFT</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Quanyi Chair', 'Cora', 'The curved crest rail represents Heaven (round), resting on the square seat symbolizing Earth. Supreme technical virtuosity expressed through profound visual silence.')">
+              <span>Read Cora's Field Notes</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 06 -->
+        <article class="stop-card" id="stop06" style="border: 2px solid var(--c-part2);">
+          <div class="stop-header">
+            <span class="stop-number" style="color: var(--c-part2);">STOP 06 &bull; c. 1859 (THE TURNING POINT)</span>
+            <span class="stop-era">Vienna &bull; Industrial Dawn</span>
+          </div>
+          <h3 class="stop-title">Thonet No. 14</h3>
+          <div class="stop-object-badge">🏭 Artifact: Steam-Bent Beech & 6 Flat-Pack Parts</div>
+
+          <div class="level-1-idea" style="color: var(--c-part2);">MACHINES CHANGE WHO CAN OWN DESIGN</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Steam-bent wood + standardized mass production. 36 chairs packed into a 1-cubic-meter shipping crate.
+          </div>
+
+          <p class="stop-description">
+            Michael Thonet severed furniture from bespoke artisanal exclusivity. Using pressurized steam to bend solid beech rods into standard curves, he engineered the first democratic chair of the global café society.
+          </p>
+
+          <div class="artifact-visual-box" style="background: rgba(242,100,25,0.06);">
+            <div class="artifact-svg-wrapper">
+              <svg width="220" height="150" viewBox="0 0 200 150">
+                <!-- Thonet back hoop -->
+                <path d="M75 140 L75 80 Q75 25 100 25 Q125 25 125 80 L125 140" stroke="#f26419" stroke-width="4" fill="none"/>
+                <!-- Inner hoop -->
+                <path d="M85 85 Q100 45 115 85" stroke="#ffd166" stroke-width="3" fill="none"/>
+                <!-- Circular cane seat -->
+                <ellipse cx="100" cy="85" rx="35" ry="12" stroke="#fff" stroke-width="3" fill="rgba(255,255,255,0.1)"/>
+                <text x="100" y="130" fill="#f26419" font-size="9" font-family="monospace" text-anchor="middle">STANDARDIZED &rarr; REPEATABLE</text>
+              </svg>
+            </div>
+            <div class="artifact-caption">The Turning Point: Handcrafted privilege becomes mass global accessibility.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--c-part2);">THONET &bull; ACCESSIBILITY</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Thonet No. 14', 'Cora', 'Over 50 million units sold by 1930. A product designed not for emperors, but for public conversation in Viennese coffee houses and Parisian bistros.')">
+              <span>Read Cora's Field Notes</span> &rarr;
+            </button>
+          </div>
+        </article>
       </div>
 
-      <div class="stops-timeline">
-
-        <!-- Stop 07 -->
-        <article class="stop-card" data-stop="7">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 07</span>
-            <span class="stop-date">LATE 19TH CENTURY · ENGLAND</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">✋ THE HAND FIGHTS BACK</span>
-              <h3>Arts & Crafts Movement</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Exposed dovetails, hammer marks, handcrafted honesty</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Rebellion against soulless factory imitations. Human dignity must reside inside making.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(7)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 08 -->
-        <article class="stop-card" data-stop="8">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 08</span>
-            <span class="stop-date">c. 1890–1910 · EUROPE</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">🌿 NATURE ENTERS THE FACTORY</span>
-              <h3>Art Nouveau</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Whiplash curves forged in cast iron and hot blown glass</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Industrial materials tamed into organic, living, botanical forms.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(8)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 09: Bauhaus Interactive Venn -->
-        <article class="stop-card highlight-card" data-stop="9">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 09</span>
-            <span class="stop-date">1919–1933 · GERMANY</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">ART + CRAFT + INDUSTRY</span>
-              <h3>The Bauhaus Synthesis</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Tubular steel, primary geometry, form follows function</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Stop fighting the machine. Design prototypes of beauty created specifically for mass replication.</p>
-            </div>
-
-            <!-- Venn Explorer -->
-            <div class="venn-wrapper">
-              <div class="venn-circle circle-art"><span>ART</span></div>
-              <div class="venn-circle circle-craft"><span>CRAFT</span></div>
-              <div class="venn-circle circle-industry"><span>INDUSTRY</span></div>
-              <div class="venn-center-tag">DESIGN</div>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(9)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- THE WATCH DETOUR BANNER -->
-        <div class="watch-detour-banner">
-          <div class="detour-icon">⚙️ ➔ ⌚</div>
-          <div class="detour-text">
-            <h3>THE WATCH DETOUR</h3>
-            <p><strong>Theo pulls out two pocket watches:</strong> “We’ve been discussing objects of wood and steel. But what happens when the object being engineered is <em>TIME ITSELF</em>?”</p>
-          </div>
+      <!-- Cora's Exit Transition -->
+      <div class="character-exit-card">
+        <div class="exit-avatar">
+          <span style="font-size: 3rem;">🏺</span>
         </div>
-
-        <!-- Stop 10 -->
-        <article class="stop-card" data-stop="10">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 10</span>
-            <span class="stop-date">PRE-1850s · WORKSHOPS</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">PRECISION WAS PERSONAL</span>
-              <h3>The Handcrafted Watch</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> One-off gears filed by master horologists; parts don’t fit any other watch</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Timekeeping was an elite luxury art; precision varied from artisan to artisan.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(10)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 11 -->
-        <article class="stop-card" data-stop="11">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 11</span>
-            <span class="stop-date">1850 · MASSACHUSETTS</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">TIME BECOMES REPEATABLE</span>
-              <h3>Waltham Watch Company</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> The American System: precision gauges + identical interchangeable parts</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Machines assemble machines. Anyone can replace a cracked spring off the shelf.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(11)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 12 -->
-        <article class="stop-card" data-stop="12">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 12</span>
-            <span class="stop-date">LATE 19TH CENTURY</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">INFRASTRUCTURE OVER PREFERENCE</span>
-              <h3>The Railway Standard</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Railroad chronometer audits; split-second synchronized tracks</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> A wrong watch is no longer a personal quirk—it’s a fatal collision. Precision becomes public infrastructure.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(12)">Inspect Object Details 🔎</button>
-        </article>
-
-      </div>
-
-      <!-- THE TWO WATCHES: THE CLIMACTIC COMPARISON COMPONENT -->
-      <div class="two-watches-comparator">
-        <div class="comparator-header">
-          <span class="eyebrow">THE CENTRAL DIALECTIC</span>
-          <h3>The Battle of the Two Watches</h3>
-          <p>Handcraft vs Industrial Repeatability</p>
-        </div>
-
-        <div class="watch-comparison-grid">
-          <!-- Watch A -->
-          <div class="watch-card watch-a">
-            <div class="watch-header">
-              <span class="watch-badge">WATCH A</span>
-              <h4>The Handcrafted Watch</h4>
-            </div>
-            <div class="watch-art">✋</div>
-            <ul class="watch-traits">
-              <li><strong>Visible Labour:</strong> Every file stroke marked by breath</li>
-              <li><strong>Individuality:</strong> Parts unique to this movement</li>
-              <li><strong>Patina & Wear:</strong> Ages with personal character</li>
-              <li><strong>Emotional Link:</strong> An intimate human heirloom</li>
-            </ul>
-          </div>
-
-          <!-- VS Hub -->
-          <div class="vs-divider">
-            <span>VS</span>
-          </div>
-
-          <!-- Watch B -->
-          <div class="watch-card watch-b">
-            <div class="watch-header">
-              <span class="watch-badge">WATCH B</span>
-              <h4>The Industrial Watch</h4>
-            </div>
-            <div class="watch-art">⚙️</div>
-            <ul class="watch-traits">
-              <li><strong>Interchangeability:</strong> Calibrated to 1/1000th mm</li>
-              <li><strong>Repeatability:</strong> Millions tick identically</li>
-              <li><strong>Universal Price:</strong> Precision for everyday citizens</li>
-              <li><strong>System Component:</strong> Drives train schedules & factories</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="theo-verdict">
-          <div class="theo-avatar-small">⚙️</div>
-          <p>
-            <strong>Theorist Theo’s Verdict:</strong> “Neither side lost. The factory made punctuality a human right; the workshop kept watchmaking a poetry of human presence. But tell me, Ana... <strong>what happens when time leaves the watch altogether?</strong>”
+        <div>
+          <div class="tag-badge" style="color: var(--c-part1); border-color: var(--c-part1);">CORA'S FIELD EXIT</div>
+          <p class="exit-quote">
+            "For thousands of years, objects carried the fingerprints of society. But what happens when machines learn to repeat the human hand?"
+          </p>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            The time machine vibrates violently. The smell of sandalwood and beeswax dissolves into soot and coal smoke. Theo steps forward.
           </p>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section>
-
-  <!-- ==================== PART III: DIGITAL -> INFORMATION ==================== -->
-  <section class="screen era-section era-part3" id="part-3">
-    <div class="section-container">
-
-      <!-- Era Header -->
-      <div class="era-header-card ivy-border">
-        <div class="era-title-meta">
-          <span class="part-indicator">🔵 PART III // ~2006 → TODAY & BEYOND</span>
-          <h2>WHEN TIME BECAME DIGITAL</h2>
-          <div class="thesis-pill">OBJECT → ECOSYSTEM → EMOTION</div>
+    <!-- ============================================================
+         06. PART II: WHEN MACHINES CHANGED BEAUTY (🟠 STOPS 07–12)
+         ============================================================ -->
+    <section id="part2" class="section-wrap">
+      <div class="epoch-banner epoch-part2">
+        <div class="tag-badge" style="background: rgba(242, 100, 25, 0.2); border-color: var(--c-part2); color: #fff;">
+          🟠 PART II &bull; MID-19TH C TO 1930s
         </div>
-        <div class="era-guide-bubble">
-          <div class="mini-guide-avatar">🔎</div>
-          <div class="mini-bubble-text">
-            <strong>Detective Ivy:</strong> “Hold on to your sensors. The object is no longer solid wood or brass gears. It has dissolved into clouds, antennas, batteries, and code. Let’s investigate the clues.”
-          </div>
+        <h2 style="font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; line-height: 1.15;">
+          When Machines Changed Beauty
+        </h2>
+        <p style="max-width: 720px; color: #fed7aa; font-size: 1.05rem;">
+          MACHINE &harr; HUMAN. Factory smokestacks rise. Designers grapple with mechanization, and the object of investigation turns from furniture into time itself.
+        </p>
+
+        <div class="guide-callout">
+          <span>⚙️</span>
+          <span><strong>Theorist Theo:</strong> "Steam engines forced an existential battle: Should we fight the machine, dress the machine in vines, or teach the machine to dance?"</span>
         </div>
       </div>
 
-      <div class="stops-timeline">
+      <div class="timeline-stops-container">
+        <!-- STOP 07 -->
+        <article class="stop-card" id="stop07">
+          <div class="stop-header">
+            <span class="stop-number">STOP 07 &bull; Late 19th Century</span>
+            <span class="stop-era">Arts & Crafts Movement &bull; Britain</span>
+          </div>
+          <h3 class="stop-title">The Hand Fights Back</h3>
+          <div class="stop-object-badge">✋ Ideology: Truth to Materials & William Morris</div>
 
-        <!-- Stop 13 -->
-        <article class="stop-card" data-stop="13">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 13</span>
-            <span class="stop-date">c. 2006 · CELL TOWERS & GPS</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">TIME ENTERS THE NETWORK</span>
-              <h3>Networked Synchronization</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Satellites ➔ Cellular Pings ➔ Handsets</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> We no longer wind springs. Time is beamed down as a continuous, ambient stream of invisible data.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(13)">Inspect Object Details 🔎</button>
-        </article>
+          <div class="level-1-idea">WHO SHOULD MAKE OUR OBJECTS?</div>
 
-        <!-- Stop 14 -->
-        <article class="stop-card" data-stop="14">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 14</span>
-            <span class="stop-date">2015 · THE WRIST COMPUTER</span>
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Hand-hammered rivets and raw wood chisel marks intentionally left visible as acts of moral protest against factory alienation.
           </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">COLLECTS, NOT JUST TELLS</span>
-              <h3>The Smartwatch</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Photoplethysmography (LEDs measuring pulse) + Gyroscopes</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Time is merely the background. The wrist device is now an active biometric sensor harvesting bodily reality.</p>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(14)">Inspect Object Details 🔎</button>
-        </article>
 
-        <!-- Stop 15 -->
-        <article class="stop-card highlight-card" data-stop="15">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 15</span>
-            <span class="stop-date">THE INVISIBLE PRODUCT</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">THE OBJECT DISAPPEARS</span>
-              <h3>The Connected Ecosystem</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Glass puck ↕️ Bluetooth ↕️ Cloud ↕️ Server Farm</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> The product is no longer what you hold in your hand. If the remote server shuts down, the hardware becomes a brick.</p>
-            </div>
+          <p class="stop-description">
+            John Ruskin and William Morris argued that mass factory goods degraded both the worker and the user. The handcraft revival was not mere nostalgia; it was a political demand for joyful human labor.
+          </p>
 
-            <!-- Ecosystem Flowchart -->
-            <div class="ecosystem-diagram">
-              <span class="eco-node">WRIST</span> ➔
-              <span class="eco-node">PHONE</span> ➔
-              <span class="eco-node">CLOUD</span> ➔
-              <span class="eco-node">AI / SERVERS</span>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(15)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 16: Materials Exploded View -->
-        <article class="stop-card" data-stop="16">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 16</span>
-            <span class="stop-date">ATOMIC COMPOSITION</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">WHAT IS IT MADE OF?</span>
-              <h3>Advanced Material Architecture</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Titanium, Ceramic, Bioceramics, Rare Earths, Silicon</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Materials are engineered at atomic tolerances, balancing extreme scratch resistance with circular recycled alloys.</p>
-            </div>
-
-            <div class="materials-chip-row">
-              <span class="mat-chip" title="Aerospace Grade Strength">TITANIUM</span>
-              <span class="mat-chip" title="Zirconia Polish">CERAMIC</span>
-              <span class="mat-chip" title="Low Virgin Impact">RECYCLED AL</span>
-              <span class="mat-chip" title="Castor-oil Base">BIOCERAMIC</span>
-              <span class="mat-chip" title="3nm Nanoscale Lithography">SILICON</span>
-            </div>
-          </div>
-          <button class="btn-inspect" onclick="openDeepInspect(16)">Inspect Object Details 🔎</button>
-        </article>
-
-        <!-- Stop 17: Lifecycle Interactive Fork -->
-        <article class="stop-card fork-card" data-stop="17">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 17 · THE FORK</span>
-            <span class="stop-date">LIFECYCLE DIVERGENCE</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">WHAT HAPPENS AFTER USE?</span>
-              <h3>Cradle to Cradle vs Cradle to Grave</h3>
-            </div>
-
-            <!-- Fork Switcher -->
-            <div class="fork-interactive">
-              <div class="fork-buttons">
-                <button class="btn-fork active" id="btn-show-mech">♻️ Mechanical Watch Path</button>
-                <button class="btn-fork" id="btn-show-smart">🔋 Smartwatch Path</button>
+          <div class="artifact-visual-box">
+            <div style="display: flex; align-items: center; justify-content: space-around; width: 100%; max-width: 400px;">
+              <div style="text-align: center;">
+                <div style="font-size: 2.5rem;">🏭</div>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim); margin-top: 0.4rem;">MACHINE</div>
               </div>
-              <div class="fork-display" id="fork-display-content">
-                <!-- Dynamically populated via JS -->
+              <div style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: 800; color: var(--c-part2);">
+                VS.
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 2.5rem;">✋</div>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--c-part1); margin-top: 0.4rem;">HUMAN HAND</div>
               </div>
             </div>
+            <div class="artifact-caption">Moral Tension: The visible human hand stands against industrial soullessness.</div>
           </div>
-          <button class="btn-inspect" onclick="openDeepInspect(17)">Inspect Object Details 🔎</button>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">LABOUR &bull; ETHICS</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Arts & Crafts', 'Theo', 'Morris famously stated: Have nothing in your houses that you do not know to be useful or believe to be beautiful. But because hand labor was costly, only the rich could afford his socialist craft.')">
+              <span>Read Theo's Dossier</span> &rarr;
+            </button>
+          </div>
         </article>
 
-        <!-- Stop 18 -->
-        <article class="stop-card" data-stop="18">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 18</span>
-            <span class="stop-date">THE CORE QUESTION</span>
+        <!-- STOP 08 -->
+        <article class="stop-card" id="stop08">
+          <div class="stop-header">
+            <span class="stop-number">STOP 08 &bull; c. 1890–1910</span>
+            <span class="stop-era">Art Nouveau &bull; Paris, Brussels, Vienna</span>
           </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">EMOTIONAL DURABILITY</span>
-              <h3>Surviving Because We Love It</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Scratches, patina, hand repairs, personal memory transfer</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Sustainability isn't just low carbon—it’s emotional value. If an object is loved, it is never discarded.</p>
+          <h3 class="stop-title">Nature Enters the Machine Age</h3>
+          <div class="stop-object-badge">🌿 Aesthetic: Whiplash Curves & Cast Iron Vines</div>
+
+          <div class="level-1-idea">ORGANIC LIVING FORMS IN INDUSTRIAL STEEL</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Curvilinear iron metro entrances by Hector Guimard. Factories casting iron into orchids, tendrils, and dragonfly wings.
+          </div>
+
+          <p class="stop-description">
+            Rather than rejecting industrial casting, Art Nouveau designers poured molten metal into organic, undulating plant forms. The rigid factory pipe was bent to mimic living stems.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div class="morph-container">
+              <svg width="260" height="110" viewBox="0 0 260 110">
+                <path id="pipeMorphPath" d="M20 55 L240 55" stroke="#f26419" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <circle id="morphBud1" cx="80" cy="55" r="4" fill="#ffd166"/>
+                <circle id="morphBud2" cx="180" cy="55" r="4" fill="#ffd166"/>
+              </svg>
+              <input type="range" id="morphRange" class="morph-slider" min="0" max="100" value="0" oninput="updateMorph(this.value)">
+              <div class="artifact-caption" id="morphText">Drag Slider: From Rigid Factory Pipe (0%) to Living Floral Vine (100%)</div>
             </div>
           </div>
-          <button class="btn-inspect" onclick="openDeepInspect(18)">Inspect Object Details 🔎</button>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">ART NOUVEAU &bull; ORGANIC</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Art Nouveau', 'Theo', 'Guimard treated iron like botanical dough. Paris Metro pavilions were prefabricated cast modules assembled into what looked like alien vegetation.')">
+              <span>Read Theo's Dossier</span> &rarr;
+            </button>
+          </div>
         </article>
 
-        <!-- Stop 19 -->
-        <article class="stop-card" data-stop="19">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 19</span>
-            <span class="stop-date">SPATIAL ACCESSIBILITY</span>
+        <!-- STOP 09 -->
+        <article class="stop-card" id="stop09">
+          <div class="stop-header">
+            <span class="stop-number">STOP 09 &bull; 1919–1933</span>
+            <span class="stop-era">The Bauhaus &bull; Weimar, Dessau</span>
           </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">MUSEUM HAS NO WALLS</span>
-              <h3>Digital Provenance & Photogrammetry</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> LiDAR scanning + sub-millimeter 3D interactive archives</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> Ancient objects escape glass vitrines. A kid in Nairobi inspects Reniseneb’s chair in VR.</p>
-            </div>
+          <h3 class="stop-title">Art, Craft & Industry Reconciled</h3>
+          <div class="stop-object-badge">📐 Philosophy: Form Follows Function</div>
+
+          <div class="level-1-idea">WHAT IF BEAUTY, CRAFT & INDUSTRY WORK TOGETHER?</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Tubular steel, unadorned primary geometries, and prototypes intended for serial factory mass production.
           </div>
-          <button class="btn-inspect" onclick="openDeepInspect(19)">Inspect Object Details 🔎</button>
+
+          <p class="stop-description">
+            Walter Gropius united artists, craftspeople, and industrial engineers. The ornament was stripped; beauty would emerge authentically from proportion, structure, and materials.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div class="bauhaus-diagram">
+              <div class="bauhaus-circle bc-art" onclick="showBauhaus('art')">ART</div>
+              <div class="bauhaus-circle bc-craft" onclick="showBauhaus('craft')">CRAFT</div>
+              <div class="bauhaus-circle bc-industry" onclick="showBauhaus('industry')">INDUSTRY</div>
+              <div class="bauhaus-center-core">DESIGN</div>
+            </div>
+            <div class="artifact-caption" id="bauhausNotice">Hover or click circles: Synthesis at the epicenter.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">BAUHAUS &bull; SYNTHESIS</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Bauhaus', 'Theo', 'Marcel Breuer was inspired by bicycle handlebars to bend tubular steel into the Wassily chair. Craft training became the foundation for industrial mass reproduction.')">
+              <span>Read Theo's Dossier</span> &rarr;
+            </button>
+          </div>
         </article>
 
-        <!-- Stop 20 -->
-        <article class="stop-card" data-stop="20">
-          <div class="stop-meta">
-            <span class="stop-number">STOP 20 · FINAL CLUE</span>
-            <span class="stop-date">THE UNBROKEN QUESTION</span>
-          </div>
-          <div class="stop-body">
-            <div class="stop-level1">
-              <span class="stop-big-label">CAN WE TRUST THIS OBJECT?</span>
-              <h3>Digital Passports & Provenance</h3>
-            </div>
-            <div class="stop-level2">
-              <p class="clue-tag"><strong>CLUE:</strong> Cryptographic tags, supply chain tracing, AI material scans</p>
-              <p class="big-idea"><strong>BIG IDEA:</strong> The tools moved from hallmarks and wax seals to cryptographic ledgers, but the yearning remains: *Is it genuine?*</p>
+        <!-- THE WATCH DETOUR (STOPS 10-12) -->
+        <div style="background: rgba(242, 100, 25, 0.08); border: 2px dashed var(--c-part2); border-radius: var(--radius-md); padding: 2rem; margin: 3rem 0;">
+          <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <span style="font-size: 2.2rem;">⏱️</span>
+            <div>
+              <div class="tag-badge" style="color: var(--c-part2); border-color: var(--c-part2);">THE CRITICAL DETOUR</div>
+              <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff;">
+                Theo Notices: "What happens when the object is TIME itself?"
+              </h3>
             </div>
           </div>
-          <button class="btn-inspect" onclick="openDeepInspect(20)">Inspect Object Details 🔎</button>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">
+            Until now, we studied furniture organizing physical bodies in rooms. But the industrial revolution demanded something far more radical: <strong>the coordination of human seconds.</strong>
+          </p>
+        </div>
+
+        <!-- STOP 10 -->
+        <article class="stop-card" id="stop10">
+          <div class="stop-header">
+            <span class="stop-number">STOP 10 &bull; Pre-Industrial</span>
+            <span class="stop-era">Handcrafted Horology &bull; Swiss Jura Valleys</span>
+          </div>
+          <h3 class="stop-title">The Handmade Watch</h3>
+          <div class="stop-object-badge">⌚ Artifact: Individually Filed Escapements</div>
+
+          <div class="level-1-idea">PRECISION WAS PERSONAL & SINGULAR</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Movements assembled by master watchmakers. If a gear broke, a new gear had to be manually filed from raw brass to fit that specific watch.
+          </div>
+
+          <p class="stop-description">
+            Timepieces were precious heirlooms of immense cost. Components were unique; accuracy reflected the idiosyncratic fingertip skill of an individual craftsman in a winter chalet.
+          </p>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">HANDMADE &bull; PERSONAL TIME</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Handmade Horology', 'Theo', 'The établissage system dispersed piece-work to alpine farmers during winter. Each watch had a personal heart, but two watches rarely agreed.')">
+              <span>Read Theo's Dossier</span> &rarr;
+            </button>
+          </div>
         </article>
 
+        <!-- STOP 11 -->
+        <article class="stop-card" id="stop11">
+          <div class="stop-header">
+            <span class="stop-number">STOP 11 &bull; 1850</span>
+            <span class="stop-era">Waltham Watch Co. &bull; Massachusetts</span>
+          </div>
+          <h3 class="stop-title">The American System: Interchangeability</h3>
+          <div class="stop-object-badge">⚙️ Artifact: Gauges, Jigs & 100% Interchangeable Parts</div>
+
+          <div class="level-1-idea">TIME BECOMES REPEATABLE & DEMOCRATIZED</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Micrometric precision gauges. A balance wheel made on Monday would drop effortlessly into a watch case assembled on Friday.
+          </div>
+
+          <p class="stop-description">
+            Waltham dismantled the European master-apprentice monopoly. By transferring precision from human fingers into dedicated steel machine tools, timepieces dropped in cost by 90%.
+          </p>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">WALTHAM &bull; INTERCHANGEABLE</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Waltham System', 'Theo', 'Swiss watchmakers were shocked at the 1876 Centennial Exposition: Americans were manufacturing high-precision watches like firearms or sewing machines.')">
+              <span>Read Theo's Dossier</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 12 -->
+        <article class="stop-card" id="stop12">
+          <div class="stop-header">
+            <span class="stop-number">STOP 12 &bull; 1883</span>
+            <span class="stop-era">The Railway Age &bull; Standard Time Zones</span>
+          </div>
+          <h3 class="stop-title">Railways: Accuracy Becomes Infrastructure</h3>
+          <div class="stop-object-badge">🚂 Artifact: The Railroad Pocket Chronometer</div>
+
+          <div class="level-1-idea">A WRONG WATCH = A CATASTROPHIC DISASTER</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            The Great Kipton Train Wreck of 1891 (caused by an engineer's watch stopping for 4 minutes). Accuracy transformed from personal luxury into critical civil infrastructure.
+          </div>
+
+          <p class="stop-description">
+            Before trains, every town kept its own local solar noon. Transcontinental speed demanded standard railway time. Watches now needed strict inspection certification (&plusmn;30 seconds per week).
+          </p>
+
+          <!-- Railway visual -->
+          <div class="artifact-visual-box">
+            <svg width="280" height="100" viewBox="0 0 280 100">
+              <!-- Two railway tracks -->
+              <line x1="20" y1="30" x2="260" y2="30" stroke="#f26419" stroke-width="4"/>
+              <line x1="20" y1="70" x2="260" y2="70" stroke="#f26419" stroke-width="4"/>
+              <!-- Cross ties -->
+              <path d="M40 20 L40 80 M80 20 L80 80 M120 20 L120 80 M160 20 L160 80 M200 20 L200 80 M240 20 L240 80" stroke="#ffd166" stroke-width="2"/>
+              <!-- Center watch -->
+              <circle cx="140" cy="50" r="22" fill="#07090e" stroke="#fff" stroke-width="3"/>
+              <line x1="140" y1="50" x2="140" y2="38" stroke="#f26419" stroke-width="2"/>
+              <line x1="140" y1="50" x2="150" y2="50" stroke="#f26419" stroke-width="2"/>
+            </svg>
+            <div class="artifact-caption">Between Precision & Chaos: The watch synchronizes continental networks.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">RAILWAYS &bull; INFRASTRUCTURE</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Railroad Chronometers', 'Theo', 'Webb C. Ball established rigid horological standards for railroad timekeepers: 17 jewels, temperature compensation, lever set. Time became an inviolable system.')">
+              <span>Read Theo's Dossier</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- THE TWO WATCHES SHOWDOWN -->
+        <div class="watch-comparison-arena">
+          <!-- Watch A -->
+          <div class="watch-card watch-a">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">✋</div>
+            <h4 style="font-size: 1.2rem; color: #fff;">WATCH A</h4>
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--c-part1); margin-bottom: 1rem;">THE HANDCRAFTED WATCH</div>
+            <ul class="watch-spec-list">
+              <li><span>&bull;</span> Visible human labor & filing</li>
+              <li><span>&bull;</span> Material character & patina</li>
+              <li><span>&bull;</span> Extreme individuality (1 of 1)</li>
+              <li><span>&bull;</span> Deep emotional inheritance</li>
+            </ul>
+            <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: auto;">Value derived from artisanal human soul.</div>
+          </div>
+
+          <!-- VS Badge -->
+          <div class="watch-vs-badge">VS</div>
+
+          <!-- Watch B -->
+          <div class="watch-card watch-b">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">⚙️</div>
+            <h4 style="font-size: 1.2rem; color: #fff;">WATCH B</h4>
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--c-part2); margin-bottom: 1rem;">THE INDUSTRIAL WATCH</div>
+            <ul class="watch-spec-list">
+              <li><span>&bull;</span> Micrometric precision gauges</li>
+              <li><span>&bull;</span> Standardized interchangeable parts</li>
+              <li><span>&bull;</span> Repeatable mechanical consistency</li>
+              <li><span>&bull;</span> Global mass accessibility</li>
+            </ul>
+            <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: auto;">Value derived from democratic utility.</div>
+          </div>
+        </div>
+
+        <!-- Theo's Exit -->
+        <div class="character-exit-card">
+          <div class="exit-avatar" style="border-color: var(--c-part2);">
+            <span style="font-size: 3rem;">⚙️</span>
+          </div>
+          <div>
+            <div class="tag-badge" style="color: var(--c-part2); border-color: var(--c-part2);">THEO'S SYNTHESIS & EXIT</div>
+            <p class="exit-quote">
+              "Neither watch won. The industrial watch made precision accessible. The handcrafted watch preserved the meaning of human labor. But what happens when time no longer lives inside the watch at all?"
+            </p>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+              Theo taps his pocket watch. The mechanical ticking abruptly ceases. The watch face flashes bright electric blue. The physical gears vanish into code.
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ==================== 04: THE THREE OBJECTS SYNTHESIS ==================== -->
-  <section class="screen synthesis-screen" id="synthesis">
-    <div class="section-container">
-      <div class="center-header">
-        <span class="eyebrow">04 // THE 3-MINUTE SYNTHESIS</span>
-        <h2 class="section-title">Three Objects. 4,000 Years.</h2>
-        <p class="section-lead">The central thesis of human design compressed into a single glance.</p>
+    <!-- ============================================================
+         07. PART III: WHEN TIME BECAME DIGITAL (🔵 STOPS 13–20)
+         ============================================================ -->
+    <section id="part3" class="section-wrap">
+      <div class="epoch-banner epoch-part3">
+        <div class="tag-badge" style="background: rgba(0, 229, 255, 0.2); border-color: var(--c-part3); color: #fff;">
+          🔵 PART III &bull; c. 2006 TO TOMORROW
+        </div>
+        <h2 style="font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 900; line-height: 1.15;">
+          When Time Became Digital
+        </h2>
+        <p style="max-width: 720px; color: #cffafe; font-size: 1.05rem;">
+          OBJECT &rarr; ECOSYSTEM. A blue digital grid stretches into infinity. The standalone device dissolves into clouds, sensor feeds, planetary satellites, and questions of permanence.
+        </p>
+
+        <div class="guide-callout">
+          <span>🔎</span>
+          <span><strong>Detective Ivy:</strong> "Follow the telemetry clues. The object on your wrist isn't a watch anymore—it is an intake valve for your biology."</span>
+        </div>
       </div>
+
+      <div class="timeline-stops-container">
+        <!-- STOP 13 -->
+        <article class="stop-card" id="stop13">
+          <div class="stop-header">
+            <span class="stop-number">STOP 13 &bull; Around 2006</span>
+            <span class="stop-era">The Networked Planet</span>
+          </div>
+          <h3 class="stop-title">Time Enters the Network</h3>
+          <div class="stop-object-badge">🛰️ Infrastructure: NTP, GPS Satellites & Cellular Sync</div>
+
+          <div class="level-1-idea">TIME NO LONGER RESIDES IN A MECHANISM</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Time is now beamed downwards from atomic clocks orbiting 20,200 km above Earth in GPS constellations.
+          </div>
+
+          <p class="stop-description">
+            For 500 years, time lived in coiled springs and quartz crystals on your wrist. Suddenly, the wrist became a mere dumb terminal displaying an ambient celestial signal:
+            <br />
+            <strong>SATELLITES &rarr; SMARTPHONES &rarr; NETWORKS &rarr; WRIST</strong>.
+          </p>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">NETWORK &bull; SYNCHRONY</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Network Time', 'Ivy', 'Coordinated Universal Time (UTC) is weighted across 400+ atomic clocks globally. Your device does not tick; it queries an ongoing planetary consensus.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 14 -->
+        <article class="stop-card" id="stop14">
+          <div class="stop-header">
+            <span class="stop-number">STOP 14 &bull; 2015</span>
+            <span class="stop-era">The Connected Wrist</span>
+          </div>
+          <h3 class="stop-title">The Smartwatch: Biometric Collector</h3>
+          <div class="stop-object-badge">❤️ Telemetry: Photoplethysmography & Gyroscopes</div>
+
+          <div class="level-1-idea">IT DOES NOT JUST TELL TIME &bull; IT COLLECTS INFORMATION</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Flashing green LEDs penetrate human skin to monitor arterial blood pulses 24/7.
+          </div>
+
+          <p class="stop-description">
+            The fundamental object shifted purpose. Rather than informing the user what hour it is, the smartwatch informs data brokers and algorithms about the wearer's heart rate, sleep cycles, steps, and stress.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; max-width: 400px;">
+              <span class="tag-badge" style="color: #ef4444; border-color: #ef4444;">❤️ Heart Data</span>
+              <span class="tag-badge" style="color: #60a5fa; border-color: #60a5fa;">😴 Sleep REM</span>
+              <span class="tag-badge" style="color: #34d399; border-color: #34d399;">🏃 Movement</span>
+              <span class="tag-badge" style="color: #fbbf24; border-color: #fbbf24;">📱 Notifications</span>
+              <span class="tag-badge" style="color: #a78bfa; border-color: #a78bfa;">☁️ Cloud Sync</span>
+              <span class="tag-badge" style="color: var(--c-part3); border-color: var(--c-part3);">📊 Behavioral Data</span>
+            </div>
+            <div class="artifact-caption">The Inversion: The wearer becomes the observed artifact.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">DATA &bull; BIOMETRICS</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Smartwatch Inversion', 'Ivy', 'A mechanical watch was an introverted tool of self-reliance. A smartwatch is an extroverted peripheral tied to an insatiable corporate cloud.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 15 -->
+        <article class="stop-card" id="stop15">
+          <div class="stop-header">
+            <span class="stop-number">STOP 15 &bull; The Modern Paradigm</span>
+            <span class="stop-era">Ambient Computing</span>
+          </div>
+          <h3 class="stop-title">The Object Disappears into an Ecosystem</h3>
+          <div class="stop-object-badge">🌐 Reality: Software & Updates Overrule Hardware</div>
+
+          <div class="level-1-idea">THE PRODUCT IS NO LONGER JUST THE THING YOU HOLD</div>
+
+          <div class="level-2-clue">
+            <strong>Historical Clue:</strong>
+            Sever the wireless connection, and the smartwatch loses 90% of its utility. The hardware is only a portal into an ecosystem.
+          </div>
+
+          <p class="stop-description">
+            PHONE &harr; COMPANION APP &harr; CLOUD SERVERS &harr; OS UPDATES &harr; USER TELEMETRY.
+            The physical casing is merely a node in a dynamic, software-regulated web.
+          </p>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">ECOSYSTEM &bull; AMBIENT</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Ecosystemic Design', 'Ivy', 'When software updates cease, perfectly functional aerospace titanium casings become electronic bricks. Design permanence has relocated to the software architecture.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 16 -->
+        <article class="stop-card" id="stop16">
+          <div class="stop-header">
+            <span class="stop-number">STOP 16 &bull; Material Forensics</span>
+            <span class="stop-era">Global Supply Chains</span>
+          </div>
+          <h3 class="stop-title">What Is It Made Of?</h3>
+          <div class="stop-object-badge">🔬 Investigation: Advanced Material Engineering</div>
+
+          <div class="level-1-idea">PLANETARY MINING CONDENSED ONTO A WRIST</div>
+
+          <p class="stop-description">
+            Detective Ivy breaks down the modern wearable into its constituent elements:
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+            <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid #94a3b8;">
+              <strong style="color: #fff; font-size: 0.9rem;">TITANIUM</strong>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">Ultra-light & aerospace-strong strength-to-weight ratio.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid #38bdf8;">
+              <strong style="color: #fff; font-size: 0.9rem;">CERAMIC / SAPPHIRE</strong>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">Extreme scratch-resistance; crystalline optical clarity.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid #34d399;">
+              <strong style="color: #fff; font-size: 0.9rem;">RECYCLED GOLD & COBALT</strong>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">Lower impact circular metallurgy within the battery and logic board.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: var(--radius-sm); border-left: 3px solid #a855f7;">
+              <strong style="color: #fff; font-size: 0.9rem;">SILICON WAFER</strong>
+              <p style="font-size: 0.78rem; color: var(--text-muted);">3-nanometer etched lithography containing 16 billion transistors.</p>
+            </div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">MATERIALS &bull; EXTRACTION</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Material Geopolitics', 'Ivy', 'The smartwatch represents the single most geographically dispersed supply chain in human history: Chilean lithium, Congolese cobalt, and Taiwanese silicon.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 17 -->
+        <article class="stop-card" id="stop17">
+          <div class="stop-header">
+            <span class="stop-number">STOP 17 &bull; The Post-Use Divergence</span>
+            <span class="stop-era">Lifecycle Forensics</span>
+          </div>
+          <h3 class="stop-title">What Happens After Use?</h3>
+          <div class="stop-object-badge">⚖️ The Visual Fork: Two Destinies</div>
+
+          <div class="level-1-idea">THE FORK BETWEEN HEIRLOOM & OBSOLESCENCE</div>
+
+          <div class="lifecycle-fork-container">
+            <!-- Mechanical Lifecycle -->
+            <div class="fork-card mechanical">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.5rem;">♻️</span>
+                <strong style="color: #fff;">MECHANICAL WATCH</strong>
+              </div>
+              <div class="fork-flow" style="color: var(--c-part3);">
+                CRADLE &rarr; REPAIR &rarr; RESTORE &rarr; PASS ON &rarr; CRADLE
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Scratches become patina and memory. Every component can be remade on an ordinary watchmaker's lathe 150 years later.
+              </p>
+            </div>
+
+            <!-- Smartwatch Lifecycle -->
+            <div class="fork-card smart">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.5rem;">🔋</span>
+                <strong style="color: #fff;">SMARTWATCH</strong>
+              </div>
+              <div class="fork-flow" style="color: #f87171;">
+                CRADLE &rarr; USE &rarr; BATTERY DECAY &rarr; OS DROP &rarr; GRAVE
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-muted);">
+                Adhesive-sealed chassis resists maintenance. When the lithium battery degrades or cloud servers terminate security keys, the object expires.
+              </p>
+            </div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">LIFECYCLE &bull; DESTINIES</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Lifecycle Analysis', 'Ivy', 'Electronics represent the fastest-growing waste stream on Earth. Less than 20% of e-waste is formally documented as recycled.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 18 -->
+        <article class="stop-card" id="stop18">
+          <div class="stop-header">
+            <span class="stop-number">STOP 18 &bull; Philosophical Clue</span>
+            <span class="stop-era">Emotional Design Theory</span>
+          </div>
+          <h3 class="stop-title">The Real Question: Emotional Durability</h3>
+          <div class="stop-object-badge">💡 Revelation: Jonathan Chapman's Theory</div>
+
+          <div class="level-1-idea">A PRODUCT CAN SURVIVE BECAUSE WE LOVE IT</div>
+
+          <div class="level-2-clue">
+            <strong>Detective Ivy's Realization:</strong>
+            "Maybe sustainability isn't only about what a product is made from. Maybe it's also about whether someone cares enough to keep it."
+          </div>
+
+          <p class="stop-description">
+            Mechanical watches accumulate scratches, patina, repairs, and memories. Instead of making the artifact worthless, <strong>TIME MAKES IT MORE MEANINGFUL</strong>.
+            True longevity requires an emotional bridge between user and object.
+          </p>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">DURABILITY &bull; EMOTION</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Emotional Durability', 'Ivy', 'Emotional durability posits that we discard objects not because they are broken, but because we have spiritually fallen out of love with them. Antique objects deepen in narrative with wear.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 19 -->
+        <article class="stop-card" id="stop19">
+          <div class="stop-header">
+            <span class="stop-number">STOP 19 &bull; Digital Heritage</span>
+            <span class="stop-era">The Virtual Institution</span>
+          </div>
+          <h3 class="stop-title">The Museum Has No Walls</h3>
+          <div class="stop-object-badge">🏛️ Medium: Photogrammetry, NeRFs & Spatial 3D</div>
+
+          <div class="level-1-idea">OBJECTS LIBERATED FROM GLASS CASES</div>
+
+          <p class="stop-description">
+            A fragile 3,500-year-old Egyptian chair or complex mechanical escapement is no longer confined to London or Cairo:
+            <br />
+            <strong>HIGH-RES CAMERA &rarr; 3D POINT CLOUD &rarr; SPATIAL SCAN &rarr; GLOBALLY ACCESSIBLE</strong>.
+            Anyone on Earth can rotate, explode, and dissect the artifact at millimeter scale.
+          </p>
+
+          <div class="artifact-visual-box">
+            <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--c-part3); text-align: center; line-height: 1.8;">
+              [ 📷 8K RASTER SCAN ] &rarr; [ 🧊 3D MESH ] &rarr; [ 🌐 INTERACTIVE BROWSER ]
+            </div>
+            <div class="artifact-caption">Democratic Preservation: Heritage accessible to all humanity.</div>
+          </div>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">HERITAGE &bull; SPATIAL</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Digital Twin Museums', 'Ivy', 'By scanning artifacts in volumetric 3D, indigenous cultures reclaim repatriated digital twins while allowing international students to inspect chisel marks down to the micrometer.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+
+        <!-- STOP 20 -->
+        <article class="stop-card" id="stop20">
+          <div class="stop-header">
+            <span class="stop-number">STOP 20 &bull; The Threshold</span>
+            <span class="stop-era">Cryptographic Provenance</span>
+          </div>
+          <h3 class="stop-title">The Final Clue: Digital Passports & Trust</h3>
+          <div class="stop-object-badge">🔐 Horizon: AI Verification & Immutable Ledgers</div>
+
+          <div class="level-1-idea">THE TOOLS CHANGED &bull; THE QUESTION DID NOT</div>
+
+          <div class="level-2-clue">
+            <strong>The Eternal Question:</strong>
+            Can we trust this object? Who made it? What human hands or algorithms touched it?
+          </div>
+
+          <p class="stop-description">
+            From the pharaoh's hieroglyphic seal in 1450 BCE to encrypted digital product passports today, humanity has always sought proof of provenance, authenticity, and ethical origin. The search for trust simply moved into code.
+          </p>
+
+          <div class="stop-footer">
+            <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim);">AUTHENTICITY &bull; TOMORROW</span>
+            <button class="btn-deep-dive" onclick="openArchivalModal('Digital Product Passports', 'Ivy', 'EU Digital Product Passports will mandate tracking recycled content, labor conditions, and repair manuals across an object whole existence. Transparency becomes law.')">
+              <span>Read Ivy's Ledger</span> &rarr;
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         08. MASTER SYNTHESIS: THE THREE OBJECTS (04)
+         ============================================================ -->
+    <section id="synthesis" class="section-wrap" style="text-align: center;">
+      <div class="tag-badge">04 &bull; MASTER SYNTHESIS</div>
+      <h2 style="font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 900; margin-bottom: 1rem;">
+        The Entire Journey in Three Objects
+      </h2>
+      <p style="max-width: 720px; margin: 0 auto 3rem; color: var(--text-muted); font-size: 1.1rem;">
+        4,000 years distilled into a single cognitive pattern:
+        <br />
+        <strong>CHAIR &rarr; WATCH &rarr; SMARTWATCH</strong>
+      </p>
 
       <div class="three-objects-grid">
-        <!-- Object 1 -->
-        <div class="triptych-card trip-chair">
-          <div class="trip-icon">🪑</div>
-          <div class="trip-time">1450 BCE – 1859</div>
-          <h3>THE CHAIR</h3>
-          <div class="trip-organizes">ORGANIZED SOCIETY</div>
-          <ul class="trip-list">
-            <li>👑 Power & Status</li>
-            <li>🏛️ Civic Class</li>
-            <li>👗 Social interaction</li>
-          </ul>
+        <!-- 1. The Chair -->
+        <div class="three-card c1">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🪑</div>
+          <h3 style="font-size: 1.6rem; color: #fff; font-weight: 800;">THE CHAIR</h3>
+          <div style="color: var(--c-part1); font-weight: 700; font-size: 1.05rem; margin-bottom: 1rem;">
+            ORGANIZED SOCIETY
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Positioned bodies in physical space to establish hierarchy, monarchy, and civic dialogue.
+          </p>
+          <div class="three-step-list">
+            <span>Power</span>
+            <span class="three-arrow">&darr;</span>
+            <span>Status</span>
+            <span class="three-arrow">&darr;</span>
+            <span>Social Life</span>
+          </div>
         </div>
 
-        <!-- Arrow -->
-        <div class="trip-arrow">➔</div>
-
-        <!-- Object 2 -->
-        <div class="triptych-card trip-watch">
-          <div class="trip-icon">⌚</div>
-          <div class="trip-time">1850s – 1950s</div>
-          <h3>THE WATCH</h3>
-          <div class="trip-organizes">ORGANIZED TIME</div>
-          <ul class="trip-list">
-            <li>⚙️ Interchangeable parts</li>
-            <li>🚂 Railroad safety</li>
-            <li>🏭 Factory labour & shifts</li>
-          </ul>
+        <!-- 2. The Watch -->
+        <div class="three-card c2">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">⌚</div>
+          <h3 style="font-size: 1.6rem; color: #fff; font-weight: 800;">THE WATCH</h3>
+          <div style="color: var(--c-part2); font-weight: 700; font-size: 1.05rem; margin-bottom: 1rem;">
+            ORGANIZED TIME
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Disciplined human consciousness to coordinate locomotives, factories, and standard global time.
+          </p>
+          <div class="three-step-list">
+            <span>Craft</span>
+            <span class="three-arrow">&darr;</span>
+            <span>Industry</span>
+            <span class="three-arrow">&darr;</span>
+            <span>Precision</span>
+          </div>
         </div>
 
-        <!-- Arrow -->
-        <div class="trip-arrow">➔</div>
-
-        <!-- Object 3 -->
-        <div class="triptych-card trip-smartwatch">
-          <div class="trip-icon">📱</div>
-          <div class="trip-time">TODAY → BEYOND</div>
-          <h3>THE SMARTWATCH</h3>
-          <div class="trip-organizes">ORGANIZES INFORMATION</div>
-          <ul class="trip-list">
-            <li>❤️ Biometric health streams</li>
-            <li>☁️ Distributed ecosystems</li>
-            <li>⏳ The quest for emotional durability</li>
-          </ul>
+        <!-- 3. The Smartwatch -->
+        <div class="three-card c3">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🌐</div>
+          <h3 style="font-size: 1.6rem; color: #fff; font-weight: 800;">THE SMARTWATCH</h3>
+          <div style="color: var(--c-part3); font-weight: 700; font-size: 1.05rem; margin-bottom: 1rem;">
+            ORGANIZES INFORMATION
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Extends human biology directly into cloud servers, biometrics, software updates, and global data swarms.
+          </p>
+          <div class="three-step-list">
+            <span>Time</span>
+            <span class="three-arrow">&darr;</span>
+            <span>Data</span>
+            <span class="three-arrow">&darr;</span>
+            <span>Ecosystem</span>
+          </div>
         </div>
       </div>
 
-      <div class="synthesis-quote-card">
-        <p class="synthesis-thesis">
-          “Objects changed. Human priorities changed with them. <br>
-          <strong>From establishing hierarchy, to synchronizing labor, to harvesting human identity.</strong>”
+      <div style="background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: var(--radius-md); max-width: 800px; margin: 0 auto; border: 1px solid rgba(255,255,255,0.08);">
+        <p style="font-family: var(--font-mono); font-size: 1.05rem; color: #fff; letter-spacing: 0.5px;">
+          OBJECTS CHANGED &bull; HUMAN PRIORITIES CHANGED WITH THEM
         </p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ==================== 05: ANA RETURNS & FINAL SCREEN ==================== -->
-  <section class="screen finale-screen" id="finale">
-    <div class="finale-content">
-      <div class="crew-reunion">
-        <span class="crew-mini-badge">🧭 ANA</span>
-        <span class="crew-mini-badge">🏺 CORA</span>
-        <span class="crew-mini-badge">⚙️ THEO</span>
-        <span class="crew-mini-badge">🔎 IVY</span>
+    <!-- ============================================================
+         09. ANA RETURNS & FINAL REVELATION (05)
+         ============================================================ -->
+    <section id="return" class="section-wrap">
+      <div class="final-revelation-box">
+        <div class="tag-badge" style="border-color: var(--c-accent); color: var(--c-accent);">05 &bull; ANA RETURNS</div>
+
+        <div style="margin: 2rem auto; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,209,102,0.1); border: 2px solid var(--c-accent); display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 3.5rem;">🧭</span>
+        </div>
+
+        <p style="font-size: 1.35rem; color: #cbd5e1; max-width: 700px; margin: 0 auto; font-style: italic;">
+          "I thought I was travelling through history. But I was really travelling through the things humans chose to make."
+        </p>
+        <p style="color: var(--text-dim); margin-top: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;">
+          &mdash; Captain Ana, standing with Cora, Theo, and Ivy
+        </p>
+
+        <div class="progression-ladder">
+          <span>POWER</span>
+          <span class="ladder-arrow">&darr;</span>
+          <span>CRAFT</span>
+          <span class="ladder-arrow">&darr;</span>
+          <span>PRECISION</span>
+          <span class="ladder-arrow">&darr;</span>
+          <span>DIGITAL</span>
+          <span class="ladder-arrow">&darr;</span>
+          <span>MEANING</span>
+          <span class="ladder-arrow">&darr;</span>
+          <span style="font-weight: 800; color: var(--c-accent); font-size: 1.3rem;">WHAT WILL WE LEAVE BEHIND?</span>
+        </div>
+
+        <div style="height: 1px; width: 160px; background: rgba(255,255,255,0.2); margin: 3rem auto;"></div>
+
+        <h2 class="monumental-quote">
+          OBJECTS DO NOT MERELY SURVIVE HISTORY.<br />
+          THEY REMEMBER IT.
+        </h2>
+
+        <p class="monumental-sub">
+          "The objects were never silent. We simply had to learn how to listen."
+        </p>
+
+        <div style="margin-top: 3rem; display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;">
+          <button class="cta-button" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); playTimeWarp();">
+            <span>START EXPEDITION AGAIN ↺</span>
+          </button>
+          <button class="btn-hud" style="padding: 0.9rem 1.5rem; font-size: 0.95rem;" onclick="copyJourneySummary()">
+            <span>📋 Copy Expedition Field Summary</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================================================
+       10. ARCHIVAL MODAL (LEVEL 3 EXPLORATION DRAWER)
+       ============================================================ -->
+  <div id="archivalModal" class="modal-overlay" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()" title="Close Archival Note">&times;</button>
+      
+      <div class="modal-crew-header">
+        <div id="modalAvatar" style="font-size: 2.2rem;">🏺</div>
+        <div>
+          <div id="modalBadge" class="tag-badge" style="margin-bottom: 0.2rem;">FIELD NOTE</div>
+          <h3 id="modalTitle" style="font-size: 1.3rem; color: #fff;">Artifact Archive</h3>
+        </div>
       </div>
 
-      <h2 class="finale-statement">
-        “I thought I was travelling through history. <br>
-        <span class="highlight-text">I was really travelling through the things humans chose to make.</span>”
-      </h2>
-      <p class="final-speaker">— Captain Ana, Time Expedition Return</p>
-
-      <div class="finale-monolith">
-        <div class="monolith-line">POWER</div>
-        <div class="monolith-arrow">↓</div>
-        <div class="monolith-line">CRAFT</div>
-        <div class="monolith-arrow">↓</div>
-        <div class="monolith-line">PRECISION</div>
-        <div class="monolith-arrow">↓</div>
-        <div class="monolith-line">DIGITAL</div>
-        <div class="monolith-arrow">↓</div>
-        <div class="monolith-line">MEANING</div>
-        <div class="monolith-arrow">↓</div>
-        <div class="monolith-line future-pulse">WHAT COMES NEXT?</div>
+      <div id="modalBody" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.7;">
+        <!-- Dynamic content injected by JavaScript -->
       </div>
 
-      <div class="climax-manifesto">
-        <h3>OBJECTS DO NOT MERELY SURVIVE HISTORY. <br>THEY REMEMBER IT.</h3>
-        <p>The objects were never silent. We simply had to learn how to listen.</p>
-      </div>
-
-      <div class="finale-actions">
-        <button class="cta-button" onclick="restartExpedition()">RESTART EXPEDITION ↺</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== LEVEL 3: DEEP EXPLORE MODAL ==================== -->
-  <div class="modal-backdrop" id="inspect-modal" aria-hidden="true">
-    <div class="modal-card">
-      <button class="modal-close" id="modal-close" aria-label="Close Inspector">&times;</button>
-      <div class="modal-header">
-        <span class="modal-badge" id="modal-badge">STOP DATA</span>
-        <h3 id="modal-title">Object Inspection</h3>
-        <div class="modal-guide" id="modal-guide">Guide: Curator Cora</div>
-      </div>
-      <div class="modal-content" id="modal-content">
-        <!-- Injected via JavaScript -->
+      <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end;">
+        <button class="btn-hud" onclick="closeModal()">Close Log Entry</button>
       </div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <!-- ============================================================
+       11. JAVASCRIPT: AUDIO SYNTH, INTERACTIVITY & SCROLLER
+       ============================================================ -->
+  <script>
+    /* ------------------------------------------------------------
+       AUDIO ENGINE (Web Audio API Synthesizer - Zero dependencies)
+       ------------------------------------------------------------ */
+    let audioCtx = null;
+    let soundEnabled = false;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudio() {
+      initAudio();
+      soundEnabled = !soundEnabled;
+      const soundIcon = document.getElementById('soundIcon');
+      const soundText = document.getElementById('soundText');
+      const soundBtn = document.getElementById('soundToggle');
+
+      if (soundEnabled) {
+        soundIcon.textContent = '🔊';
+        soundText.textContent = 'Sound On';
+        soundBtn.classList.add('sound-active');
+        playBeep(600, 0.1);
+      } else {
+        soundIcon.textContent = '🔇';
+        soundText.textContent = 'Sound Off';
+        soundBtn.classList.remove('sound-active');
+      }
+    }
+
+    function playBeep(freq = 440, duration = 0.08, type = 'sine') {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.warn('Audio synthesis note blocked:', e);
+      }
+    }
+
+    function playTimeWarp() {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {}
+    }
+
+    /* ------------------------------------------------------------
+       EXPEDITION PROGRESS & ACTIVE SECTION HIGHLIGHTER
+       ------------------------------------------------------------ */
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progressBar').style.width = scrolled + '%';
+
+      // Update Nav Nodes Active State
+      const sections = ['part1', 'part2', 'part3', 'synthesis'];
+      const scrollPos = window.scrollY + 200;
+
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        const node = document.querySelector(`.hud-node[href="#${id}"]`);
+        if (el && node) {
+          if (scrollPos >= el.offsetTop && scrollPos < el.offsetTop + el.offsetHeight) {
+            node.classList.add('active');
+          } else {
+            node.classList.remove('active');
+          }
+        }
+      });
+    });
+
+    /* ------------------------------------------------------------
+       READING MODE TOGGLE (Level 1: 3-Min Scan vs Level 2: Full)
+       ------------------------------------------------------------ */
+    let quickScanActive = false;
+    function toggleReadingSpeed() {
+      quickScanActive = !quickScanActive;
+      playBeep(quickScanActive ? 800 : 400, 0.08);
+
+      const btn = document.getElementById('modeToggle');
+      const descriptions = document.querySelectorAll('.stop-description, .artifact-caption, .stop-footer');
+
+      if (quickScanActive) {
+        btn.innerHTML = '<span>📖 Full History</span>';
+        btn.style.background = 'rgba(255, 209, 102, 0.2)';
+        btn.style.borderColor = 'var(--c-accent)';
+        descriptions.forEach(el => el.style.display = 'none');
+      } else {
+        btn.innerHTML = '<span>⚡ 3-Min Scan</span>';
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        descriptions.forEach(el => el.style.display = '');
+      }
+    }
+
+    /* ------------------------------------------------------------
+       INTERACTIVE WIDGETS
+       ------------------------------------------------------------ */
+    // Stop 05: Ming Chair Joinery X-Ray Glow
+    let joineryActive = false;
+    function toggleJoineryGlow() {
+      joineryActive = !joineryActive;
+      const glow = document.getElementById('joineryGlow');
+      const label = document.getElementById('joineryLabel');
+      playBeep(joineryActive ? 750 : 350, 0.06);
+
+      if (joineryActive) {
+        glow.setAttribute('stroke', '#00e5ff');
+        glow.setAttribute('r', '18');
+        glow.setAttribute('opacity', '1');
+        label.innerHTML = '<span style="color: var(--c-part3);">X-RAY ACTIVE: Concealed Double Mortise-Tenon Pressure Locks</span>';
+      } else {
+        glow.setAttribute('stroke', '#00e5ff');
+        glow.setAttribute('r', '10');
+        glow.setAttribute('opacity', '0.3');
+        label.textContent = 'SIMPLE OUTSIDE • COMPLEX INSIDE';
+      }
+    }
+
+    // Stop 08: Morph Slider (Art Nouveau Straight to Vine)
+    function updateMorph(val) {
+      const path = document.getElementById('pipeMorphPath');
+      const text = document.getElementById('morphText');
+      const buds = [document.getElementById('morphBud1'), document.getElementById('morphBud2')];
+
+      // Interpolate between flat straight pipe and whiplash curve
+      const amplitude = (val / 100) * 45;
+      const d = `M20 55 Q70 ${55 - amplitude} 130 55 T240 ${55 + amplitude / 2}`;
+      path.setAttribute('d', d);
+
+      buds[0].setAttribute('cy', 55 - amplitude * 0.7);
+      buds[1].setAttribute('cy', 55 + amplitude * 0.35);
+
+      if (val < 25) {
+        text.textContent = `Mechanical Factory Pipe (${val}%) — Rigid industrial utility`;
+        path.setAttribute('stroke', '#f26419');
+      } else if (val < 75) {
+        text.textContent = `Transitioning (${val}%) — Iron yielding to botanical flow`;
+        path.setAttribute('stroke', '#ffd166');
+      } else {
+        text.textContent = `Organic Whiplash Vine (${val}%) — Nature dominates machine iron`;
+        path.setAttribute('stroke', '#34d399');
+      }
+    }
+
+    // Stop 09: Bauhaus Overlap Inspector
+    function showBauhaus(circle) {
+      playBeep(520, 0.05);
+      const notice = document.getElementById('bauhausNotice');
+      if (circle === 'art') {
+        notice.innerHTML = '<strong style="color: #e63946;">ART:</strong> Spiritual expressiveness, color theory (Kandinsky, Klee).';
+      } else if (circle === 'craft') {
+        notice.innerHTML = '<strong style="color: #457b9d;">CRAFT:</strong> Material mastery, joinery, weaving, metal shop discipline.';
+      } else if (circle === 'industry') {
+        notice.innerHTML = '<strong style="color: #e9c46a;">INDUSTRY:</strong> Mass replication, cost reduction, standardized modularity.';
+      }
+    }
+
+    /* ------------------------------------------------------------
+       CREW & ARCHIVAL MODAL CONTROLLER (Level 3 Deep Dive)
+       ------------------------------------------------------------ */
+    const crewData = {
+      ana: {
+        avatar: '🧭',
+        role: 'MISSION COMMANDER & TIME TRAVELLER',
+        title: "Captain Ana's Voyage Directive",
+        body: `
+          <p><strong>Primary Objective:</strong> Trace the evolution of manufactured human objects over 4,000 years to identify what society values in each epoch.</p>
+          <br/>
+          <p><strong>Methodology:</strong> We treat artifacts not as static decorative relics, but as crystallized social contracts. A chair reveals who was allowed to sit; a watch reveals who governed the workday; a smartwatch reveals who owns our biological data.</p>
+          <br/>
+          <p><em>"The machine doesn't travel through empty space. It travels through the choices of craftsmen, inventors, factory laborers, and programmers."</em></p>
+        `
+      },
+      cora: {
+        avatar: '🏺',
+        role: 'CHIEF CURATOR & CULTURAL ANTHROPOLOGIST',
+        title: "Curator Cora's Historical Principles",
+        body: `
+          <p><strong>Core Thesis:</strong> "Objects carry the fingerprints of society."</p>
+          <br/>
+          <p>Before mass manufacturing, an object was an investment of hundreds of hours of manual labor. Because it was costly, it was coded with religious, political, and monarchical symbolism.</p>
+          <br/>
+          <p>When you examine the Chair of Reniseneb or the Coronation Chair, you are inspecting the physical architecture of power. To change the furniture was to challenge the political order.</p>
+        `
+      },
+      theo: {
+        avatar: '⚙️',
+        role: 'INDUSTRIAL DESIGN THEORIST',
+        title: "Theorist Theo's Mechanical Ledger",
+        body: `
+          <p><strong>Core Thesis:</strong> "Mechanization didn't just change production; it revolutionized human consciousness."</p>
+          <br/>
+          <p>The transition from the handmade Swiss escapement to the Waltham American System marked the birth of interchangeability. For the first time, a broken part did not require an artisan—it required only an identical replacement.</p>
+          <br/>
+          <p>When the railway age arrived in 1883, time became infrastructure. Precision was no longer a virtue of luxury; precision was required to prevent high-speed collisions.</p>
+        `
+      },
+      ivy: {
+        avatar: '🔎',
+        role: 'FORENSIC DETECTIVE & FUTURIST',
+        title: "Detective Ivy's Ecosystem Brief",
+        body: `
+          <p><strong>Core Thesis:</strong> "The object has dissolved into a network, forcing an urgent question of emotional and physical durability."</p>
+          <br/>
+          <p>In the digital epoch, we no longer buy things that stand alone. Every smartwatch is tethered to cellular towers, telemetry servers, and planned software lifecycles.</p>
+          <br/>
+          <p>When an antique pocket watch scratches, it gains character. When a modern screen scratches or its lithium battery swells, it approaches the graveyard. The future of design depends on rediscovering emotional permanence.</p>
+        `
+      }
+    };
+
+    function openCrewModal(crewKey) {
+      playBeep(480, 0.06);
+      const member = crewData[crewKey];
+      if (!member) return;
+
+      document.getElementById('modalAvatar').textContent = member.avatar;
+      document.getElementById('modalBadge').textContent = member.role;
+      document.getElementById('modalTitle').textContent = member.title;
+      document.getElementById('modalBody').innerHTML = member.body;
+      document.getElementById('archivalModal').classList.add('open');
+    }
+
+    function openArchivalModal(title, guide, text) {
+      playBeep(580, 0.06);
+      const avatars = { Cora: '🏺', Theo: '⚙️', Ivy: '🔎', Ana: '🧭' };
+      document.getElementById('modalAvatar').textContent = avatars[guide] || '📜';
+      document.getElementById('modalBadge').textContent = `${guide}'S ARCHIVAL DOSSIER`;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalBody').innerHTML = `
+        <p style="font-size: 1.05rem; color: #fff; margin-bottom: 1rem;"><strong>Historical Analysis:</strong></p>
+        <p>${text}</p>
+        <br/>
+        <div style="background: rgba(255,255,255,0.04); padding: 0.8rem; border-radius: var(--radius-sm); border-left: 3px solid var(--c-accent); font-size: 0.85rem; font-family: var(--font-mono);">
+          EXPEDITION TIMESTAMP VERIFIED &bull; ARCHIVE ACCESS GRANTED
+        </div>
+      `;
+      document.getElementById('archivalModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('archivalModal').classList.remove('open');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'archivalModal') {
+        closeModal();
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    /* ------------------------------------------------------------
+       FIELD SUMMARY COPY ACTION
+       ------------------------------------------------------------ */
+    function copyJourneySummary() {
+      playBeep(650, 0.08);
+      const summaryText = `TIME TRAVEL THROUGH OBJECTS (Expedition Field Log)
+Thesis: What can objects tell us about the people who made them?
+1. PART I (1450 BCE - 1859): OBJECT -> SOCIETY (Chair = Power, Status & Social Life)
+2. PART II (Mid-19th C - 1930s): MACHINE -> TIME (Watch = Craft vs. Repeatable Industrial Precision)
+3. PART III (2006 - Future): DIGITAL -> INFORMATION (Smartwatch = Biometrics, Ecosystem & Emotional Durability)
+Conclusion: "Objects do not merely survive history. They remember it."`;
+
+      navigator.clipboard.writeText(summaryText).then(() => {
+        alert('Expedition field log copied to clipboard!');
+      }).catch(() => {
+        alert(summaryText);
+      });
+    }
+  </script>
 </body>
 </html>
